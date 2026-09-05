@@ -248,16 +248,14 @@ jobs:
           # On Android takeScreenshot() needs convertFlutterSurfaceToImage(),
           # which the test calls; without a real GPU that only works with the
           # swiftshader renderer selected above.
-          # reactivecircus runs this with /usr/bin/sh, so no bashisms here.
+          # reactivecircus runs every LINE of this script as its own `sh -c`, so
+          # no bashisms and no backslash continuations: one command per line.
           script: |
             set -eu
             adb wait-for-device
             adb shell settings put global window_animation_scale 0
             adb uninstall com.crispstrobe.hectopolis || true
-            SCREENSHOT_DEVICE=pixel_7_api34 flutter drive \
-              --driver=test_driver/integration_test.dart \
-              --target=integration_test/screenshots_test.dart \
-              -d emulator-5554
+            SCREENSHOT_DEVICE=pixel_7_api34 flutter drive --driver=test_driver/integration_test.dart --target=integration_test/screenshots_test.dart -d emulator-5554
 
       - name: List the captured PNGs
         if: always()
