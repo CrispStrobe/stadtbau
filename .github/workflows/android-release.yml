@@ -1,0 +1,232 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Android release pipeline (task T-402).
+#
+# Triggers:
+#   * push of a tag `v*`      -> build, upload artifacts, attach APK + AAB to the release
+#   * workflow_dispatch       -> build and upload artifacts only (dry_run defaults to true)
+#
+# Secrets (see docs/release/android.md):
+#   ANDROID_KEYSTORE_BASE64   base64 of the upload keystore (.jks)
+#   ANDROID_KEYSTORE_PASSWORD store password
+#   ANDROID_KEY_ALIAS         key alias, e.g. `upload`
+#   ANDROID_KEY_PASSWORD      key password
+#
+# Without those secrets the job still builds; the Gradle config then falls back to
+# the debug key, the artifacts are marked unsigned and no release is published.
+name: android-release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build only; do not create or update a GitHub release'
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # `secrets` is not allowed in `if:`, so the presence of the keystore is
+      # turned into a plain environment variable here and compared as a string.
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+      IS_TAG: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.1
+          cache: true
+
+      - name: Toolchain
+        run: |
+          flutter --version
+          java -version
+          echo "ANDROID_HOME=${ANDROID_HOME:-unset} ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-unset}"
+
+      - name: Resolve version from app/pubspec.yaml
+        id: version
+        run: |
+          set -euo pipefail
+          raw="$(sed -n 's/^version:[[:space:]]*//p' app/pubspec.yaml | head -n1 | tr -d "\"' \r\t")"
+          if [ -z "$raw" ]; then
+            echo "::error::app/pubspec.yaml has no version: line"
+            exit 1
+          fi
+          name="${raw%%+*}"
+          if [ "$raw" = "$name" ]; then
+            number=1
+          else
+            number="${raw##*+}"
+          fi
+          echo "build_name=$name" >> "$GITHUB_OUTPUT"
+          echo "build_number=$number" >> "$GITHUB_OUTPUT"
+          echo "pubspec_version=$raw" >> "$GITHUB_OUTPUT"
+          echo "pubspec version $raw -> build-name $name, build-number $number"
+
+      - name: Tag matches pubspec version
+        if: env.IS_TAG == 'true'
+        env:
+          BUILD_NAME: ${{ steps.version.outputs.build_name }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF#refs/tags/}"
+          if [ "${tag#v}" = "$BUILD_NAME" ]; then
+            echo "tag $tag matches app/pubspec.yaml version $BUILD_NAME"
+          elif [ "${DRY_RUN}" = "true" ]; then
+            echo "::warning::tag $tag does not match app/pubspec.yaml version $BUILD_NAME"
+          else
+            echo "::error::tag $tag does not match app/pubspec.yaml version $BUILD_NAME; bump app/pubspec.yaml or retag"
+            exit 1
+          fi
+
+      - name: A published release needs the upload key
+        if: env.IS_TAG == 'true' && env.DRY_RUN == 'false' && env.HAS_KEYSTORE != 'true'
+        run: |
+          echo "::error::ANDROID_KEYSTORE_BASE64 is not set; refusing to publish a debug-signed release"
+          exit 1
+
+      - name: Write keystore and key.properties
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::secret $name is empty but ANDROID_KEYSTORE_BASE64 is set"
+              exit 1
+            fi
+          done
+          umask 077
+          keystore="${RUNNER_TEMP}/upload-keystore.jks"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$keystore"
+          chmod 600 "$keystore"
+          if ! keytool -list -keystore "$keystore" \
+              -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" > /dev/null; then
+            echo "::error::cannot open the keystore with ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS"
+            exit 1
+          fi
+          # java.util.Properties reads a backslash as an escape character, so double it.
+          esc() { printf '%s' "$1" | sed 's/\\/\\\\/g'; }
+          {
+            printf 'storeFile=%s\n' "$(esc "$keystore")"
+            printf 'storePassword=%s\n' "$(esc "$ANDROID_KEYSTORE_PASSWORD")"
+            printf 'keyAlias=%s\n' "$(esc "$ANDROID_KEY_ALIAS")"
+            printf 'keyPassword=%s\n' "$(esc "$ANDROID_KEY_PASSWORD")"
+          } > app/android/key.properties
+          echo "wrote app/android/key.properties (keystore $(stat -c%s "$keystore") bytes)"
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Localizations
+        run: cd app && flutter gen-l10n
+
+      - name: Build app bundle
+        run: |
+          cd app
+          flutter build appbundle --release \
+            --build-name "${{ steps.version.outputs.build_name }}" \
+            --build-number "${{ steps.version.outputs.build_number }}"
+
+      - name: Build APK
+        run: |
+          cd app
+          flutter build apk --release \
+            --build-name "${{ steps.version.outputs.build_name }}" \
+            --build-number "${{ steps.version.outputs.build_number }}"
+
+      - name: Collect artifacts
+        if: ${{ !cancelled() }}
+        env:
+          BUILD_NAME: ${{ steps.version.outputs.build_name }}
+          BUILD_NUMBER: ${{ steps.version.outputs.build_number }}
+        run: |
+          set -euo pipefail
+          suffix=""
+          if [ "$HAS_KEYSTORE" != "true" ]; then
+            suffix="-unsigned"
+            echo "::warning::built with the debug key (no upload keystore configured)"
+          fi
+          mkdir -p dist
+          base="hectopolis-v${BUILD_NAME}-build${BUILD_NUMBER}${suffix}"
+          cp app/build/app/outputs/bundle/release/app-release.aab "dist/${base}.aab" || true
+          cp app/build/app/outputs/flutter-apk/app-release.apk "dist/${base}.apk" || true
+          ls -l dist || true
+          sha256sum dist/* > "dist/SHA256SUMS.txt" 2>/dev/null || true
+          cat dist/SHA256SUMS.txt 2>/dev/null || true
+
+      - name: Upload build artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ steps.version.outputs.build_name }}-${{ steps.version.outputs.build_number }}
+          path: dist/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Attach to GitHub release
+        if: env.IS_TAG == 'true' && env.DRY_RUN == 'false' && env.HAS_KEYSTORE == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          fail_on_unmatched_files: true
+          files: |
+            dist/*.apk
+            dist/*.aab
+            dist/SHA256SUMS.txt
+          body: |
+            Hectopolis ${{ steps.version.outputs.pubspec_version }} for Android.
+
+            * `.apk` - sideload / direct install
+            * `.aab` - Google Play upload artifact
+
+            Source: AGPL-3.0-or-later with the section 7 app-store exception
+            (see `LICENSE` and `LICENSE-EXCEPTION.md`).
+
+      # Google Play upload is deliberately not wired up yet: the app has to be
+      # created in the Play Console and the first bundle uploaded by hand before
+      # the API accepts automated uploads (see docs/release/android.md).
+      # When that is done, add the service-account JSON as the repository secret
+      # PLAY_SERVICE_ACCOUNT_JSON and enable:
+      #
+      # - name: Upload to Google Play (internal track)
+      #   if: env.IS_TAG == 'true' && env.DRY_RUN == 'false' && env.HAS_KEYSTORE == 'true'
+      #   uses: r0adkll/upload-google-play@v1
+      #   with:
+      #     serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+      #     packageName: com.crispstrobe.hectopolis
+      #     releaseFiles: app/build/app/outputs/bundle/release/app-release.aab
+      #     track: internal
+      #     status: completed
+
+      - name: Remove signing material
+        if: ${{ always() }}
+        run: rm -f app/android/key.properties "${RUNNER_TEMP}/upload-keystore.jks"

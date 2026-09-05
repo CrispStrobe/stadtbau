@@ -24,6 +24,12 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<!-- Export compliance, baked in so every build auto-answers the App Store
+	     Connect encryption question. Hectopolis uses no encryption beyond
+	     the exempt platform HTTPS, so this is false. Without it each build
+	     sits in "Missing Compliance" until a human clicks through. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

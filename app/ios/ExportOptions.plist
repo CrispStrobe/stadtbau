@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>teamID</key>
+	<string>N9XSJ4M3GT</string>
+	<!-- MANUAL signing. CI holds only the Apple Distribution private key plus
+	     one explicit IOS_APP_STORE provisioning profile (created through the
+	     App Store Connect API and bound to that exact certificate). We
+	     deliberately never pass `-allowProvisioningUpdates`: on a headless
+	     runner it mints a *Development* certificate and, to stay under Apple's
+	     five-certificate account limit, silently revokes the shared
+	     Distribution certificate — which breaks signing for every app on the
+	     account. See docs/release/ios.md. -->
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<!-- The profile NAME (not its UUID or id). It must match the `Name` key of
+	     the .mobileprovision in the ASC_PROFILE_BASE64 secret, and the profile
+	     must be bound to the same certificate as DIST_CERT_P12_BASE64, or
+	     -exportArchive fails with `profile "…" doesn't include signing
+	     certificate`. -->
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.crispstrobe.hectopolis</key>
+		<string>Hectopolis AppStore CI</string>
+	</dict>
+	<key>destination</key>
+	<string>export</string>
+	<!-- Ship dSYMs so App Store Connect can symbolicate crash reports. -->
+	<key>uploadSymbols</key>
+	<true/>
+	<key>stripSwiftSymbols</key>
+	<true/>
+	<!-- Never let Xcode rewrite CFBundleVersion / CFBundleShortVersionString:
+	     they come from app/pubspec.yaml (version: X.Y.Z+BUILD) and the upload
+	     step passes the same values to altool. -->
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+</dict>
+</plist>
