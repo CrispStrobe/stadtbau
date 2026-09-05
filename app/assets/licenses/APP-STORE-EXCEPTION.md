@@ -1,12 +1,12 @@
 # Additional permission under GNU AGPL version 3 section 7 (App Store Exception)
 
-Stadtbau is licensed under the GNU Affero General Public License, version 3 or (at your
+Hectopolis is licensed under the GNU Affero General Public License, version 3 or (at your
 option) any later version ("AGPL"). See `LICENSE`.
 
-As a special exception to the AGPL, the copyright holders of Stadtbau grant the following
+As a special exception to the AGPL, the copyright holders of Hectopolis grant the following
 **additional permission** under section 7 of the AGPL:
 
-> Notwithstanding any other provision of the AGPL, the copyright holders of Stadtbau
+> Notwithstanding any other provision of the AGPL, the copyright holders of Hectopolis
 > (hereafter "the Publishers") are permitted to convey object code versions of this Program,
 > and of works based on this Program, through application distribution platforms
 > ("app stores", including but not limited to the Apple App Store, Google Play, the
@@ -18,12 +18,12 @@ As a special exception to the AGPL, the copyright holders of Stadtbau grant the 
 > does not grant any recipient or third party the right to convey the Program under terms
 > other than the AGPL.
 
-Every version of Stadtbau distributed through an app store is published with its complete
+Every version of Hectopolis distributed through an app store is published with its complete
 Corresponding Source at the repository named in the About screen, under the AGPL.
 
 ## Contributions
 
-By contributing to Stadtbau you agree that your contribution is licensed under the AGPL
+By contributing to Hectopolis you agree that your contribution is licensed under the AGPL
 **including this additional permission**, and you certify the Developer Certificate of
 Origin (see `CONTRIBUTING.md`). Without this agreement we could not distribute app-store
 builds that contain your contribution.

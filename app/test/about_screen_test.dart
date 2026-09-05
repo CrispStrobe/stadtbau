@@ -21,8 +21,8 @@ Widget _app(Locale locale) => MaterialApp(
 void main() {
   setUp(() {
     PackageInfo.setMockInitialValues(
-      appName: 'Stadtbau',
-      packageName: 'de.stadtbau.stadtbau',
+      appName: 'Hectopolis',
+      packageName: 'com.crispstrobe.hectopolis',
       version: '0.1.0',
       buildNumber: '1',
       buildSignature: '',

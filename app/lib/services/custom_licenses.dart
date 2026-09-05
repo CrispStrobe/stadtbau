@@ -54,7 +54,7 @@ void ensureCustomLicensesRegistered() {
     try {
       final agpl = await rootBundle.loadString('assets/licenses/AGPL-3.0.txt');
       final exception = await rootBundle.loadString('assets/licenses/APP-STORE-EXCEPTION.md');
-      yield LicenseEntryWithLineBreaks(const ['Stadtbau'], '$exception\n\n$agpl');
+      yield LicenseEntryWithLineBreaks(const ['Hectopolis'], '$exception\n\n$agpl');
     } on Object catch (e) {
       debugPrint('custom_licenses: could not load bundled license texts: $e');
     }
@@ -63,6 +63,6 @@ void ensureCustomLicensesRegistered() {
     for (final s in dataSources) {
       buffer.writeln('${s.title}\n  ${s.license}\n  ${s.url}\n');
     }
-    yield LicenseEntryWithLineBreaks(const ['Stadtbau model data sources'], buffer.toString());
+    yield LicenseEntryWithLineBreaks(const ['Hectopolis model data sources'], buffer.toString());
   });
 }

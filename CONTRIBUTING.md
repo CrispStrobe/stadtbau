@@ -1,4 +1,4 @@
-# Contributing to Stadtbau
+# Contributing to Hectopolis
 
 Thank you for helping. Before you start, read `PLAN.md` (scope, model, roadmap) and
 `CLAUDE.md` (conventions). The non-negotiables are:

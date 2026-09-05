@@ -13,7 +13,7 @@ void main() {
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
-    await tester.pumpWidget(const StadtbauApp());
+    await tester.pumpWidget(const HectopolisApp());
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.grid_on), findsOneWidget);
     await tester.tap(find.byIcon(Icons.grid_on));
@@ -28,7 +28,7 @@ void main() {
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
-    await tester.pumpWidget(const StadtbauApp());
+    await tester.pumpWidget(const HectopolisApp());
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.star_border).first);
     await tester.pumpAndSettle();

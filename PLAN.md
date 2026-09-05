@@ -1,6 +1,6 @@
-# Stadtbau — Project Plan and Roadmap
+# Hectopolis — Project Plan and Roadmap
 
-Working title: **Stadtbau** (may change). A cross-platform tile-placement city/landscape
+Name: **Hectopolis** (chosen 2026-09-05 after a web collision check; register search at DPMA/EUIPO still open). Internal package names stay `stadtbau`/`stadtbau_sim`. A cross-platform tile-placement city/landscape
 simulation game about the interplay of urban habitat, ecology and economy.
 
 This file is the single source of truth for scope, architecture, the simulation model and

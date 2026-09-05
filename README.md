@@ -1,4 +1,4 @@
-# Stadtbau
+# Hectopolis
 
 A cross-platform tile-placement game about the interplay of urban habitat, ecology and
 economy. Place landscape and urban tiles on a grid and watch biodiversity, air, noise,

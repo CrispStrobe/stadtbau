@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "de.stadtbau" "\0"
-            VALUE "FileDescription", "stadtbau" "\0"
+            VALUE "CompanyName", "Christian Ströbele" "\0"
+            VALUE "FileDescription", "Hectopolis" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "stadtbau" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 de.stadtbau. All rights reserved." "\0"
-            VALUE "OriginalFilename", "stadtbau.exe" "\0"
-            VALUE "ProductName", "stadtbau" "\0"
+            VALUE "InternalName", "Hectopolis" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Christian Ströbele. AGPL-3.0-or-later." "\0"
+            VALUE "OriginalFilename", "hectopolis.exe" "\0"
+            VALUE "ProductName", "Hectopolis" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

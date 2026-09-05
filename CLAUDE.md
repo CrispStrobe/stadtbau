@@ -1,4 +1,4 @@
-# Stadtbau — agent brief
+# Hectopolis — agent brief
 
 Read `PLAN.md` first. It holds the vision, constraints, architecture, the simulation model
 and the task roadmap. Work through roadmap tasks in order unless told otherwise; mark them

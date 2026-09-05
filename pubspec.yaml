@@ -1,5 +1,5 @@
 name: stadtbau_workspace
-description: Pub workspace root for the Stadtbau game (app + packages).
+description: Pub workspace root for the Hectopolis game (app + packages).
 publish_to: none
 
 environment:

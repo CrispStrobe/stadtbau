@@ -1,6 +1,6 @@
 {
   "@@locale": "de",
-  "appTitle": "Stadtbau",
+  "appTitle": "Hectopolis",
 
   "tileName": "{id, select, meadow{Wiese} cropland{Acker} forest{Wald} water{Gewässer} park{Park} housing_low{Einfamilienhäuser} housing_high{Mehrfamilienhäuser} commercial{Gewerbe & Einzelhandel} industry{Industrie} road{Hauptstraße} other{Unbekannt}}",
 
@@ -112,18 +112,18 @@
   "breakdownRow": "{tile} · {count} Felder, nächstes {distance} m",
   "breakdownNone": "Keine Quellen in Reichweite.",
 
-  "aboutTitle": "Über Stadtbau",
+  "aboutTitle": "Über Hectopolis",
   "aboutTagline": "Eine Simulation davon, wie Stadt, Landschaft und Wirtschaft einander prägen.",
   "aboutVersionLabel": "Version {version}",
   "aboutProvider": "Anbieter",
   "aboutContact": "Kontakt",
   "aboutPrivacy": "Datenschutz",
-  "aboutPrivacyText": "Stadtbau läuft vollständig auf deinem Gerät. Gespeichert werden nur dein Spielstand und deine besten Ergebnisse, im lokalen App-Speicher. Es gibt keine Konten, keine Werbung, keine Analyse und keine Netzwerkzugriffe während des Spiels.",
+  "aboutPrivacyText": "Hectopolis läuft vollständig auf deinem Gerät. Gespeichert werden nur dein Spielstand und deine besten Ergebnisse, im lokalen App-Speicher. Es gibt keine Konten, keine Werbung, keine Analyse und keine Netzwerkzugriffe während des Spiels.",
   "aboutDisclaimer": "Haftungsausschluss",
-  "aboutDisclaimerText": "Stadtbau ist ein Spiel. Das Modell vereinfacht die reale Planungswissenschaft und verwendet veröffentlichte Durchschnittswerte, keine lokalen Messungen. Es wird ohne jede Gewähr bereitgestellt und ist keine planerische, rechtliche oder umweltfachliche Beratung.",
+  "aboutDisclaimerText": "Hectopolis ist ein Spiel. Das Modell vereinfacht die reale Planungswissenschaft und verwendet veröffentlichte Durchschnittswerte, keine lokalen Messungen. Es wird ohne jede Gewähr bereitgestellt und ist keine planerische, rechtliche oder umweltfachliche Beratung.",
   "aboutLicense": "Lizenz",
-  "aboutLicenseText": "Stadtbau ist freie Software unter der GNU Affero General Public License, Version 3 oder (nach deiner Wahl) jeder späteren Version. Du darfst sie unter dieser Lizenz nutzen, studieren, weitergeben und verändern; der vollständige Quellcode ist im oben verlinkten Repository veröffentlicht.",
-  "aboutExceptionText": "Zusatzerlaubnis nach AGPL § 7: Die Rechteinhaber dürfen Builds von Stadtbau über App Stores zu deren Bedingungen verbreiten. Der vollständige Text dieser Ausnahme ist in der App enthalten und unter den Open-Source-Lizenzen aufgeführt.",
+  "aboutLicenseText": "Hectopolis ist freie Software unter der GNU Affero General Public License, Version 3 oder (nach deiner Wahl) jeder späteren Version. Du darfst sie unter dieser Lizenz nutzen, studieren, weitergeben und verändern; der vollständige Quellcode ist im oben verlinkten Repository veröffentlicht.",
+  "aboutExceptionText": "Zusatzerlaubnis nach AGPL § 7: Die Rechteinhaber dürfen Builds von Hectopolis über App Stores zu deren Bedingungen verbreiten. Der vollständige Text dieser Ausnahme ist in der App enthalten und unter den Open-Source-Lizenzen aufgeführt.",
   "aboutDataSources": "Datenquellen des Modells",
   "aboutDataSourcesText": "Jeder Parameter der Simulation nennt eine öffentliche Quelle: deutsches und EU-Recht, amtliche Statistik und offene wissenschaftliche Modelle. Verwendet werden nur Werte, Formeln und Gesetzestexte; keine geschützten Texte, Grafiken oder Datentabellen werden übernommen. Ökolopoly, SimCity und ähnliche Spiele dienten nur als Ideengeber.",
   "aboutOpenSourceLicenses": "Open-Source-Lizenzen",

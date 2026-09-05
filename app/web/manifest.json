@@ -1,11 +1,11 @@
 {
-    "name": "stadtbau",
-    "short_name": "stadtbau",
+    "name": "Hectopolis",
+    "short_name": "Hectopolis",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F1F8E9",
+    "theme_color": "#2E7D32",
+    "description": "A simulation of how a city, its landscape and its economy shape each other.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

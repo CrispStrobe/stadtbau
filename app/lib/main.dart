@@ -8,17 +8,17 @@ import 'l10n/generated/app_localizations.dart';
 import 'ui/level_select_screen.dart';
 
 void main() {
-  runApp(const StadtbauApp());
+  runApp(const HectopolisApp());
 }
 
-class StadtbauApp extends StatefulWidget {
-  const StadtbauApp({super.key});
+class HectopolisApp extends StatefulWidget {
+  const HectopolisApp({super.key});
 
   @override
-  State<StadtbauApp> createState() => _StadtbauAppState();
+  State<HectopolisApp> createState() => _HectopolisAppState();
 }
 
-class _StadtbauAppState extends State<StadtbauApp> {
+class _HectopolisAppState extends State<HectopolisApp> {
   final SaveStore _store = SaveStore();
   late final GameController _controller = GameController(store: _store);
   Locale? _locale;
