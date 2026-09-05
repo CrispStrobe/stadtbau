@@ -294,13 +294,16 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   CC0 or self-made; record author in `THIRD_PARTY.md`), zoom and pan, 16×16 default,
   supports 8–24. 60 fps on web.
   *Note 2026-09-05:* CustomPainter grid with Material icon glyphs, 8–24 sizes. Zoom/pan and sprite assets still open.
-- [~] **T-203 Palette and drag & drop.** Draggable tile cards with remaining count (level
+  *Note 2026-09-05 (4):* T-202 zoom/pan done: `InteractiveViewer` with a `MapViewController` (min scale = fit, max 4×, translation clamped to the viewport), pinch/wheel zoom, drag pan, app-bar zoom in/out/reset; hit testing goes through the transform. Sprite assets still open.
+- [x] **T-203 Palette and drag & drop.** Draggable tile cards with remaining count (level
   limits), drop onto grid with placement preview and validation feedback, long-press to
   remove. Touch and mouse. Keyboard accessible (select tile, arrow keys, Enter).
   *Note 2026-09-05:* Drag & drop, brush tap placement, long-press clear, placement preview outline. Keyboard access still open.
-- [~] **T-204 Indicator panel.** Ten gauges with trend arrows, tap opens detail sheet
+  *Note 2026-09-05 (4):* Keyboard access done: focusable map with a cursor cell (arrows, Enter/Space place, Delete/Backspace clear, 1–9/0 pick a tile, Esc drops the brush), shortcut digits on the palette cards, `Semantics` label on the map. Tests in `app/test/map_view_test.dart`.
+- [x] **T-204 Indicator panel.** Ten gauges with trend arrows, tap opens detail sheet
   with raw values, units and a "Quelle / Source" link into `docs/model`.
   *Note 2026-09-05:* Ten gauges with detail line and tooltip hint. Source links into docs/model still open.
+  *Note 2026-09-05 (4):* Tapping a gauge (long-press or tap in the compact strip) opens a detail sheet with hint, raw values, a one-line "how it is computed" sentence per indicator and a `url_launcher` link into the matching `docs/model` file.
 - [x] **T-205 Overlays.** Toggleable heat-map overlays for noise, air, heat, green access,
   retail access, habitat quality. Colour-blind-safe palettes; legend with units.
   *Note 2026-09-05:* Nine overlays with colour-blind-safe ramps and legend.
@@ -312,8 +315,9 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   "End turn"). Autosave to local storage (`shared_preferences` / file), load/new game.
   *Note 2026-09-05:* Play/pause, step, 1×/3×/10×, new game with size slider. Autosave/load still open.
   *Note 2026-09-05 (2):* Autosave (2 s debounce) and restore via `shared_preferences` (BSD-3); test covers the round trip.
-- [ ] **T-208 Onboarding.** Three-step tutorial overlay explaining tiles, overlays and one
+- [x] **T-208 Onboarding.** Three-step tutorial overlay explaining tiles, overlays and one
   feedback loop. Strings in ARB.
+  *Note 2026-09-05:* `ui/onboarding.dart`: three steps (tiles, overlays and inspector, the housing → traffic → noise → attractiveness loop) with icon and colour illustrations, Skip/Next/Done, dismissible with Escape and by tapping outside. Shown once on first launch (`SaveStore.onboardingSeen`/`markOnboardingSeen`) and reachable again from the help icon in the level select app bar.
 
 ### Phase 3 — Levels and content
 
@@ -344,6 +348,7 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
 - [~] **T-403 iOS / macOS.** Requires a Mac runner. Document steps; Xcode project settings;
   App Store exception referenced in the About screen.
   *Note 2026-09-05:* `.github/workflows/ios-release.yml` + `tools/ios/build-ios-appstore.sh` + `app/ios/ExportOptions.plist` following `/mnt/volume1/appstore.md` (manual signing, unsigned archive, sign at export, `--upload-package`). Bundle id `com.crispstrobe.hectopolis` registered, profile "Hectopolis AppStore CI" created, 5 of 8 secrets set. Open: human creates the app record (`ASC_APP_ID`) and exports the `.p12` (`DIST_CERT_P12_BASE64`, `DIST_CERT_PASSWORD`); first dry run. `docs/release/ios.md`.
+  *Note 2026-09-05 (2):* Store screenshot pipeline: `app/integration_test/screenshots_test.dart` + `app/test_driver/integration_test.dart` + `.github/workflows/screenshots.yml` (iPhone 6.9", iPad 13", Android emulator), see `docs/release/screenshots.md`.
 - [ ] **T-404 Windows and Linux desktop** builds; installer via MSIX (Windows) and
   AppImage/Flatpak (Linux).
 - [x] **T-405 About / licenses screen.** Shows AGPL, the section 7 exception, third-party

@@ -34,6 +34,10 @@ class GameController extends ChangeNotifier {
   MapOverlay overlay = MapOverlay.none;
   int? selectedCell;
   int? hoverCell;
+
+  /// Cell the keyboard cursor sits on, or null while the keyboard is unused
+  /// (task T-203). Drawn with a double outline, distinct from the selection.
+  int? cursorCell;
   CommandError? lastError;
 
   /// 0 = paused, otherwise months per second.
@@ -86,6 +90,7 @@ class GameController extends ChangeNotifier {
     brush = null;
     selectedCell = null;
     hoverCell = null;
+    cursorCell = null;
     lastError = null;
     speed = 0;
     progress = null;
@@ -125,6 +130,63 @@ class GameController extends ChangeNotifier {
   void setBrush(TileType? t) {
     brush = brush == t ? null : t;
     notifyListeners();
+  }
+
+  /// The tile types the player may place, in palette order. Digits 1–9 and 0
+  /// in the map view select from this list.
+  List<TileType> get allowedTypes => sim.tileBudget.allowedTypes.toList();
+
+  /// Select the [i]-th allowed tile (0-based) as the brush; out-of-range
+  /// indices are ignored so that a digit without a tile does nothing.
+  void selectBrushByIndex(int i) {
+    final types = allowedTypes;
+    if (i < 0 || i >= types.length) return;
+    brush = types[i];
+    notifyListeners();
+  }
+
+  void clearBrush() {
+    if (brush == null) return;
+    brush = null;
+    notifyListeners();
+  }
+
+  /// Move the keyboard cursor by [dx]/[dy] cells, clamped to the grid. The
+  /// first move only places the cursor (on the selection, else the centre) so
+  /// that the player sees where it is before it starts moving. The cursor
+  /// drives the inspector selection as well.
+  void moveCursor(int dx, int dy) {
+    final anchor = cursorCell ?? selectedCell ?? sim.state.index(width ~/ 2, height ~/ 2);
+    final first = cursorCell == null;
+    final x = (anchor % width + (first ? 0 : dx)).clamp(0, width - 1);
+    final y = (anchor ~/ width + (first ? 0 : dy)).clamp(0, height - 1);
+    setCursor(sim.state.index(x, y));
+  }
+
+  void setCursor(int? cell) {
+    cursorCell = cell;
+    if (cell != null) selectedCell = cell;
+    notifyListeners();
+  }
+
+  /// Enter/Space: place the brush at the cursor, or select the cell for the
+  /// inspector when no brush is active. Returns whether a tile was placed.
+  bool activateCursor() {
+    final cell = cursorCell;
+    if (cell == null) return false;
+    final t = brush;
+    if (t == null) {
+      select(cell);
+      return false;
+    }
+    return place(cell % width, cell ~/ width, t);
+  }
+
+  /// Delete/Backspace: clear the cell under the cursor.
+  bool clearCursor() {
+    final cell = cursorCell;
+    if (cell == null) return false;
+    return clear(cell % width, cell ~/ width);
   }
 
   void setOverlay(MapOverlay o) {

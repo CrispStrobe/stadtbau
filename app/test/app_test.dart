@@ -9,7 +9,8 @@ import 'package:stadtbau_sim/stadtbau_sim.dart';
 
 void main() {
   testWidgets('level select opens the sandbox with palette, map and indicators', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    // Skip the first-launch onboarding overlay (T-208).
+    SharedPreferences.setMockInitialValues({'stadtbau.onboarding.v1': true});
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -24,7 +25,8 @@ void main() {
   });
 
   testWidgets('a level shows its goals', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    // Skip the first-launch onboarding overlay (T-208).
+    SharedPreferences.setMockInitialValues({'stadtbau.onboarding.v1': true});
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);

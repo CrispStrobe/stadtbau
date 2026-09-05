@@ -7,6 +7,7 @@ import '../game/save_store.dart';
 import '../l10n/generated/app_localizations.dart';
 import 'about_screen.dart';
 import 'game_screen.dart';
+import 'onboarding.dart';
 
 /// Home screen: continue the autosave, play the sandbox or pick a level.
 class LevelSelectScreen extends StatefulWidget {
@@ -33,6 +34,14 @@ class _LevelSelectScreenState extends State<LevelSelectScreen> {
   void initState() {
     super.initState();
     _refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowOnboarding());
+  }
+
+  /// On the very first launch, explain the game once (T-208).
+  Future<void> _maybeShowOnboarding() async {
+    if (await widget.store.onboardingSeen()) return;
+    if (!mounted) return;
+    await showOnboarding(context, widget.store);
   }
 
   Future<void> _refresh() async {
@@ -76,6 +85,11 @@ class _LevelSelectScreenState extends State<LevelSelectScreen> {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          IconButton(
+            tooltip: l10n.actionHelp,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () => showOnboarding(context, widget.store),
+          ),
           IconButton(tooltip: l10n.actionLanguage, icon: const Icon(Icons.translate), onPressed: widget.onLocaleToggle),
           IconButton(
             tooltip: l10n.actionAbout,

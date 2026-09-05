@@ -2,9 +2,41 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:stadtbau_sim/stadtbau_sim.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../game/game_controller.dart';
 import '../l10n/generated/app_localizations.dart';
+
+/// Base URL of the model documentation in the repository (T-204).
+const indicatorDocsBaseUrl = 'https://github.com/CrispStrobe/stadtbau/blob/main/docs/model/';
+
+/// The model document that explains each indicator.
+const indicatorDocFile = <Indicator, String>{
+  Indicator.biodiversity: 'biodiversity.md',
+  Indicator.air: 'air.md',
+  Indicator.noise: 'noise.md',
+  Indicator.housing: 'economy.md',
+  Indicator.economy: 'economy.md',
+  Indicator.shopping: 'access.md',
+  Indicator.recreation: 'access.md',
+  Indicator.commuting: 'commute.md',
+  Indicator.climate: 'heat.md',
+  Indicator.budget: 'economy.md',
+};
+
+/// The documentation URL for [indicator].
+String indicatorDocUrl(Indicator indicator) => '$indicatorDocsBaseUrl${indicatorDocFile[indicator]!}';
+
+/// Opens the detail sheet of one indicator: name, hint, current detail line,
+/// how the score is computed and a link into `docs/model` (T-204).
+Future<void> showIndicatorDetails(BuildContext context, {required Indicator indicator, required String detail}) {
+  return showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) => _IndicatorDetailsSheet(indicator: indicator, detail: detail),
+  );
+}
 
 /// Ten gauges with a detail line each. Compact mode renders a horizontal strip.
 class IndicatorPanel extends StatelessWidget {
@@ -26,22 +58,28 @@ class IndicatorPanel extends StatelessWidget {
         final n2 = NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 2);
 
         String detail(Indicator i) => switch (i) {
-              Indicator.biodiversity => l10n.statsHabitat(n0.format(ind.habitatAreaEff), n2.format(ind.habitatConnectivity)),
-              Indicator.air => l10n.statsPopulation(n0.format(ind.population)),
-              Indicator.noise => l10n.statsNoise(l10n.dbValue(n0.format(ind.meanNoiseDb))),
-              Indicator.housing => l10n.statsPopulation(n0.format(ind.population)),
-              Indicator.economy => l10n.statsJobs(n0.format(ind.jobsFilled), n0.format(ind.jobsCapacity)),
-              Indicator.shopping => l10n.statsPopulation(n0.format(ind.population)),
-              Indicator.recreation => l10n.statsHeat(l10n.degreesValue(n1.format(ind.meanHeatDeltaC))),
-              Indicator.commuting => l10n.statsCommute(
-                  l10n.kmValue(n1.format(ind.meanCommuteKm)), l10n.percentValue(n0.format(ind.carShare * 100))),
-              Indicator.climate => l10n.tonsPerYear(n0.format(ind.co2TonsPerYear)),
-              Indicator.budget => l10n.statsBudgetDelta(l10n.kEur(n0.format(ind.budgetDeltaKEur))),
-            };
+          Indicator.biodiversity => l10n.statsHabitat(
+            n0.format(ind.habitatAreaEff),
+            n2.format(ind.habitatConnectivity),
+          ),
+          Indicator.air => l10n.statsPopulation(n0.format(ind.population)),
+          Indicator.noise => l10n.statsNoise(l10n.dbValue(n0.format(ind.meanNoiseDb))),
+          Indicator.housing => l10n.statsPopulation(n0.format(ind.population)),
+          Indicator.economy => l10n.statsJobs(n0.format(ind.jobsFilled), n0.format(ind.jobsCapacity)),
+          Indicator.shopping => l10n.statsPopulation(n0.format(ind.population)),
+          Indicator.recreation => l10n.statsHeat(l10n.degreesValue(n1.format(ind.meanHeatDeltaC))),
+          Indicator.commuting => l10n.statsCommute(
+            l10n.kmValue(n1.format(ind.meanCommuteKm)),
+            l10n.percentValue(n0.format(ind.carShare * 100)),
+          ),
+          Indicator.climate => l10n.tonsPerYear(n0.format(ind.co2TonsPerYear)),
+          Indicator.budget => l10n.statsBudgetDelta(l10n.kEur(n0.format(ind.budgetDeltaKEur))),
+        };
 
         final tiles = [
           for (final i in Indicator.values)
             _Gauge(
+              indicator: i,
               label: l10n.indicatorName(i.name),
               hint: l10n.indicatorHint(i.name),
               detail: detail(i),
@@ -74,6 +112,7 @@ class IndicatorPanel extends StatelessWidget {
 
 class _Gauge extends StatelessWidget {
   const _Gauge({
+    required this.indicator,
     required this.label,
     required this.hint,
     required this.detail,
@@ -81,11 +120,14 @@ class _Gauge extends StatelessWidget {
     required this.compact,
   });
 
+  final Indicator indicator;
   final String label;
   final String hint;
   final String detail;
   final double value;
   final bool compact;
+
+  void _open(BuildContext context) => showIndicatorDetails(context, indicator: indicator, detail: detail);
 
   Color _color(BuildContext context) {
     final v = value.clamp(0, 100) / 100;
@@ -99,20 +141,25 @@ class _Gauge extends StatelessWidget {
     if (compact) {
       return Tooltip(
         message: '$hint\n$detail',
-        child: Container(
-          width: 96,
-          margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(color: theme.dividerColor),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelSmall),
-              Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
-            ],
+        child: InkWell(
+          onTap: () => _open(context),
+          onLongPress: () => _open(context),
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            width: 96,
+            margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              border: Border.all(color: theme.dividerColor),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelSmall),
+                Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
+              ],
+            ),
           ),
         ),
       );
@@ -120,29 +167,109 @@ class _Gauge extends StatelessWidget {
     return Tooltip(
       message: hint,
       waitDuration: const Duration(milliseconds: 600),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
-                Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
-              ],
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: value.clamp(0, 100) / 100,
-                minHeight: 8,
-                color: _color(context),
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+      child: InkWell(
+        onTap: () => _open(context),
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
+                  Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
+                  const SizedBox(width: 2),
+                  Icon(Icons.info_outline, size: 14, color: theme.hintColor),
+                ],
               ),
-            ),
-            Text(detail, style: theme.textTheme.bodySmall),
-          ],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: value.clamp(0, 100) / 100,
+                  minHeight: 8,
+                  color: _color(context),
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                ),
+              ),
+              Text(detail, style: theme.textTheme.bodySmall),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// Contents of the indicator detail sheet.
+class _IndicatorDetailsSheet extends StatelessWidget {
+  const _IndicatorDetailsSheet({required this.indicator, required this.detail});
+
+  final Indicator indicator;
+  final String detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final url = indicatorDocUrl(indicator);
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.indicatorName(indicator.name), style: theme.textTheme.titleLarge),
+              const SizedBox(height: 12),
+              Text(l10n.indicatorHint(indicator.name)),
+              const SizedBox(height: 8),
+              Text(detail, style: theme.textTheme.bodySmall),
+              const SizedBox(height: 16),
+              Text(l10n.indicatorFormulaLabel, style: theme.textTheme.titleSmall),
+              const SizedBox(height: 4),
+              Text(l10n.indicatorFormula(indicator.name)),
+              const SizedBox(height: 16),
+              _DocLink(label: l10n.indicatorSourceLink, url: url),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.actionClose)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Underlined, tappable text that opens [url] in the browser.
+class _DocLink extends StatelessWidget {
+  const _DocLink({required this.label, required this.url});
+
+  final String label;
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.open_in_new, size: 16, color: scheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(color: scheme.primary, decoration: TextDecoration.underline),
+          ),
+        ],
       ),
     );
   }

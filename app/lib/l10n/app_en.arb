@@ -18,6 +18,12 @@
   "indicatorHint": "{id, select, biodiversity{Habitat quality and connectivity of green patches (BKompV biotope values, InVEST habitat quality).} air{Population-weighted pollution index from traffic, industry and heating; vegetation removes part of it.} noise{Share of residents below the 55 dB(A) daytime limit for residential areas (TA Lärm).} housing{Housing capacity relative to local jobs, and how full it is.} economy{Jobs available for residents and the budget trend.} shopping{Retail within walking distance (Huff model, 700 m).} recreation{Green space within 300 m (WHO) and summer cooling.} commuting{Mean commute distance and car share (MiD 2017 mode shares).} climate{CO₂ balance of land use and traffic, plus urban heat.} budget{Municipal budget relative to the starting budget.} other{}}",
   "@indicatorHint": {"placeholders": {"id": {"type": "String"}}},
 
+  "indicatorFormula": "{id, select, biodiversity{Biotope values (BKompV) times maturity, reduced by threats from roads, industry and buildings and by fragmentation, then scaled with a species-area curve.} air{Emissions from traffic, industry and buildings spread with an exp(-d/300 m) kernel, vegetation removes part, and the resident-weighted mean becomes the score.} noise{Every source loses 20 dB per distance decade and forest or buildings attenuate further; each resident scores (65 dB - L) / 10, clamped to 0-1.} housing{100 x min(1, capacity / (jobs / 0.52)) x (0.5 + 0.5 x occupancy); zero without housing.} economy{100 x (0.6 x min(1, jobs / workers) + 0.4 x budget trend), the trend taken from the budget change in the last month.} shopping{Huff model with lambda = 2 over shops within 700 m walking distance, averaged over the residents.} recreation{Resident-weighted 0.7 x green space within 300 m plus 0.3 x (1 - delta T / maximum urban heat).} commuting{100 x (0.5 x (1 - mean distance / 20 km) + 0.5 x (1 - car share)) from the gravity commute model.} climate{100 x (0.7 x (1 - CO₂ per person / 2.5 t) + 0.3 x (1 - mean delta T / maximum urban heat)).} budget{The municipal budget divided by the starting budget, clamped to 0-100.} other{}}",
+  "@indicatorFormula": {"description": "One-line description of how an indicator score is computed", "placeholders": {"id": {"type": "String"}}},
+
+  "indicatorFormulaLabel": "How it is computed",
+  "indicatorSourceLink": "Model documentation",
+
   "overlayName": "{id, select, none{No overlay} noise{Noise} air{Air pollution} heat{Heat} green{Green access} retail{Shopping access} jobs{Job access} habitat{Habitat quality} traffic{Traffic} attractiveness{Attractiveness} other{}}",
   "@overlayName": {"placeholders": {"id": {"type": "String"}}},
 
@@ -169,5 +175,26 @@
   "aboutDataSourcesText": "Every parameter of the simulation cites a public source: German and EU law, official statistics and open scientific models. Only values, formulas and law texts are used; no protected texts, artwork or data tables are copied. Ökolopoly, SimCity and similar games served as inspiration for ideas only.",
   "aboutOpenSourceLicenses": "Open-source licenses",
   "appLegalese": "© {year} Christian Ströbele · AGPL-3.0-or-later",
-  "@appLegalese": {"placeholders": {"year": {"type": "int"}}}
+  "@appLegalese": {"placeholders": {"year": {"type": "int"}}},
+
+  "actionClose": "Close",
+  "actionHelp": "How to play",
+  "onboardingTitle": "How Hectopolis works",
+  "onboardingStepTitle": "{id, select, tiles{Place tiles} overlays{Overlays and the inspector} loop{One feedback loop} other{}}",
+  "@onboardingStepTitle": {"placeholders": {"id": {"type": "String"}}},
+  "onboardingStepBody": "{id, select, tiles{Drag a tile from the palette onto the map, or select it and tap cells. Every cell is one hectare, 100 by 100 metres.} overlays{The layers button paints noise, air, heat and access onto the map as colour. Tap a cell to read the numbers behind it and where they come from.} loop{More homes bring residents and taxes, but also traffic, noise and worse air, which makes homes less attractive again. Forests and parks dampen it.} other{}}",
+  "@onboardingStepBody": {"placeholders": {"id": {"type": "String"}}},
+  "onboardingLoopNode": "{id, select, homes{Homes} residents{Residents and taxes} traffic{Traffic} noise{Noise and air} attractiveness{Attractiveness} green{Forest and park} other{}}",
+  "@onboardingLoopNode": {"placeholders": {"id": {"type": "String"}}},
+  "onboardingStepCounter": "Step {current} of {total}",
+  "@onboardingStepCounter": {"placeholders": {"current": {"type": "int"}, "total": {"type": "int"}}},
+  "onboardingSkip": "Skip",
+  "onboardingNext": "Next",
+  "onboardingDone": "Done",
+
+  "actionZoomIn": "Zoom in",
+  "actionZoomOut": "Zoom out",
+  "actionZoomReset": "Reset view",
+  "keyboardHint": "Arrow keys move the cursor, Enter places the selected tile, Delete or Backspace clears the cell, 1–9 and 0 pick a tile, Escape drops the brush.",
+  "actionMore": "More"
 }

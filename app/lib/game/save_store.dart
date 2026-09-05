@@ -17,6 +17,7 @@ class SavedGame {
 class SaveStore {
   static const _autosaveKey = 'stadtbau.autosave.v2';
   static const _starsKey = 'stadtbau.stars.v1';
+  static const _onboardingKey = 'stadtbau.onboarding.v1';
 
   Future<void> save(String? levelId, Simulation sim) async {
     final prefs = await SharedPreferences.getInstance();
@@ -42,6 +43,17 @@ class SaveStore {
   Future<void> clear() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_autosaveKey);
+  }
+
+  /// Whether the three-step onboarding overlay has already been shown (T-208).
+  Future<bool> onboardingSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_onboardingKey) ?? false;
+  }
+
+  Future<void> markOnboardingSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_onboardingKey, true);
   }
 
   Future<Map<String, int>> bestStars() async {

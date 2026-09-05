@@ -12,6 +12,11 @@
 
   "indicatorHint": "{id, select, biodiversity{Habitatqualität und Vernetzung der Grünflächen (Biotopwerte der BKompV, InVEST Habitat Quality).} air{Einwohnergewichteter Schadstoffindex aus Verkehr, Industrie und Heizung; Vegetation baut einen Teil ab.} noise{Anteil der Einwohner unter dem Tagesrichtwert von 55 dB(A) für Wohngebiete (TA Lärm).} housing{Wohnkapazität im Verhältnis zu den Arbeitsplätzen vor Ort und ihre Auslastung.} economy{Arbeitsplätze für die Einwohner und die Entwicklung des Haushalts.} shopping{Einzelhandel in Gehweite (Huff-Modell, 700 m).} recreation{Grünflächen im 300-m-Umkreis (WHO) und sommerliche Kühlung.} commuting{Mittlere Pendeldistanz und Pkw-Anteil (Verkehrsmittelwahl nach MiD 2017).} climate{CO₂-Bilanz aus Flächennutzung und Verkehr sowie städtische Überwärmung.} budget{Gemeindehaushalt im Verhältnis zum Startbudget.} other{}}",
 
+  "indicatorFormula": "{id, select, biodiversity{Biotopwerte (BKompV) mal Reifegrad, gemindert durch Störwirkungen von Straße, Industrie und Bebauung sowie durch Zerschneidung, dann über eine Arten-Areal-Kurve skaliert.} air{Emissionen aus Verkehr, Industrie und Gebäuden verteilen sich mit einem exp(-d/300 m)-Kern, Vegetation baut einen Teil ab, und der einwohnergewichtete Mittelwert ergibt den Wert.} noise{Jede Quelle verliert 20 dB je Entfernungsdekade, Wald und Bebauung dämpfen zusätzlich; je Einwohner zählt (65 dB - L) / 10, begrenzt auf 0-1.} housing{100 x min(1, Kapazität / (Arbeitsplätze / 0,52)) x (0,5 + 0,5 x Auslastung); ohne Wohnraum null.} economy{100 x (0,6 x min(1, Arbeitsplätze / Erwerbstätige) + 0,4 x Haushaltstrend), der Trend aus der Haushaltsänderung des letzten Monats.} shopping{Huff-Modell mit Lambda = 2 über Geschäfte in 700 m Gehweite, gemittelt über die Einwohner.} recreation{Einwohnergewichtet 0,7 x Grün im 300-m-Umkreis plus 0,3 x (1 - Delta T / maximale Überwärmung).} commuting{100 x (0,5 x (1 - mittlere Distanz / 20 km) + 0,5 x (1 - Pkw-Anteil)) aus dem Gravitationsmodell des Pendelns.} climate{100 x (0,7 x (1 - CO₂ je Person / 2,5 t) + 0,3 x (1 - mittleres Delta T / maximale Überwärmung)).} budget{Der Gemeindehaushalt geteilt durch das Startbudget, begrenzt auf 0-100.} other{}}",
+
+  "indicatorFormulaLabel": "So wird gerechnet",
+  "indicatorSourceLink": "Modelldokumentation",
+
   "overlayName": "{id, select, none{Kein Overlay} noise{Lärm} air{Luftschadstoffe} heat{Hitze} green{Grünzugang} retail{Einkaufszugang} jobs{Arbeitsplatzzugang} habitat{Habitatqualität} traffic{Verkehr} attractiveness{Attraktivität} other{}}",
 
   "overlayUnit": "{id, select, noise{dB(A)} air{Index} heat{°C über Umland} green{0–1} retail{0–1} jobs{0–1} habitat{0–1} traffic{Kfz/Tag} attractiveness{0–1} other{}}",
@@ -127,5 +132,22 @@
   "aboutDataSources": "Datenquellen des Modells",
   "aboutDataSourcesText": "Jeder Parameter der Simulation nennt eine öffentliche Quelle: deutsches und EU-Recht, amtliche Statistik und offene wissenschaftliche Modelle. Verwendet werden nur Werte, Formeln und Gesetzestexte; keine geschützten Texte, Grafiken oder Datentabellen werden übernommen. Ökolopoly, SimCity und ähnliche Spiele dienten nur als Ideengeber.",
   "aboutOpenSourceLicenses": "Open-Source-Lizenzen",
-  "appLegalese": "© {year} Christian Ströbele · AGPL-3.0-or-later"
+  "appLegalese": "© {year} Christian Ströbele · AGPL-3.0-or-later",
+
+  "actionClose": "Schließen",
+  "actionHelp": "Spielanleitung",
+  "onboardingTitle": "So funktioniert Hectopolis",
+  "onboardingStepTitle": "{id, select, tiles{Felder setzen} overlays{Overlays und der Inspektor} loop{Ein Rückkopplungskreis} other{}}",
+  "onboardingStepBody": "{id, select, tiles{Ein Feld aus der Palette auf die Karte ziehen oder auswählen und Zellen antippen. Jede Zelle ist ein Hektar, 100 mal 100 Meter.} overlays{Die Ebenen-Schaltfläche färbt Lärm, Luft, Hitze und Erreichbarkeit auf der Karte ein. Eine Zelle antippen, um die Zahlen dahinter und ihre Quellen zu lesen.} loop{Mehr Wohnungen bringen Einwohner und Steuern, aber auch Verkehr, Lärm und schlechtere Luft, was Wohnen wieder unattraktiver macht. Wälder und Parks dämpfen das.} other{}}",
+  "onboardingLoopNode": "{id, select, homes{Wohnungen} residents{Einwohner und Steuern} traffic{Verkehr} noise{Lärm und Luft} attractiveness{Attraktivität} green{Wald und Park} other{}}",
+  "onboardingStepCounter": "Schritt {current} von {total}",
+  "onboardingSkip": "Überspringen",
+  "onboardingNext": "Weiter",
+  "onboardingDone": "Fertig",
+
+  "actionZoomIn": "Vergrößern",
+  "actionZoomOut": "Verkleinern",
+  "actionZoomReset": "Ansicht zurücksetzen",
+  "keyboardHint": "Pfeiltasten bewegen den Cursor, Enter setzt das gewählte Feld, Entf oder Rücktaste leert die Zelle, 1–9 und 0 wählen ein Feld, Esc legt den Pinsel ab.",
+  "actionMore": "Mehr"
 }

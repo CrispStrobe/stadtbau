@@ -21,8 +21,11 @@ class Palette extends StatelessWidget {
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
-        final types = controller.sim.tileBudget.allowedTypes.toList();
-        final cards = [for (final t in types) _TileCard(controller: controller, type: t, compact: horizontal)];
+        final types = controller.allowedTypes;
+        final cards = [
+          for (var i = 0; i < types.length; i++)
+            _TileCard(controller: controller, type: types[i], compact: horizontal, index: i),
+        ];
         if (horizontal) {
           return SizedBox(
             height: 92,
@@ -50,11 +53,17 @@ class Palette extends StatelessWidget {
 }
 
 class _TileCard extends StatelessWidget {
-  const _TileCard({required this.controller, required this.type, required this.compact});
+  const _TileCard({required this.controller, required this.type, required this.compact, required this.index});
 
   final GameController controller;
   final TileType type;
   final bool compact;
+
+  /// Position in the allowed-tile order; the first ten are reachable with the
+  /// keys 1–9 and 0 while the map has focus (task T-203).
+  final int index;
+
+  String? get _shortcut => index < 10 ? '${(index + 1) % 10}' : null;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +117,8 @@ class _TileCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (_shortcut != null)
+                  _ShortcutBadge(digit: _shortcut!),
               ],
             ),
     );
@@ -144,6 +155,28 @@ class _TileCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The 1–9/0 keyboard shortcut of a tile card.
+class _ShortcutBadge extends StatelessWidget {
+  const _ShortcutBadge({required this.digit});
+
+  final String digit;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: 20,
+      height: 20,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(digit, style: Theme.of(context).textTheme.labelSmall),
     );
   }
 }

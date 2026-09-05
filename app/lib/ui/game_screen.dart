@@ -27,6 +27,9 @@ class _GameScreenState extends State<GameScreen> {
   GameController get c => widget.controller;
   CommandError? _shownError;
 
+  /// Zoom/pan state, shared between the map and the app-bar buttons (T-202).
+  final _map = MapViewController();
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +39,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     c.removeListener(_onChanged);
+    _map.dispose();
     super.dispose();
   }
 
@@ -124,7 +128,10 @@ class _GameScreenState extends State<GameScreen> {
         ),
       ),
     );
-    if (result != null) c.startSandbox(result);
+    if (result != null) {
+      c.startSandbox(result);
+      _map.reset();
+    }
   }
 
   void _about() {
@@ -145,16 +152,37 @@ class _GameScreenState extends State<GameScreen> {
               onPressed: () => Navigator.of(context).maybePop(),
             ),
             title: Text(c.level == null ? l10n.levelTitle('sandbox') : l10n.levelTitle(c.level!.id)),
-            actions: [
-              _Clock(controller: c),
-              const SizedBox(width: 8),
-              _Transport(controller: c),
-              _OverlayMenu(controller: c),
-              if (c.level == null)
-                IconButton(tooltip: l10n.actionNewGame, icon: const Icon(Icons.restart_alt), onPressed: _newGame),
-              IconButton(tooltip: l10n.actionLanguage, icon: const Icon(Icons.translate), onPressed: widget.onLocaleToggle),
-              IconButton(tooltip: l10n.actionAbout, icon: const Icon(Icons.info_outline), onPressed: _about),
-            ],
+            actions: wide
+                ? [
+                    _Clock(controller: c),
+                    const SizedBox(width: 8),
+                    _Transport(controller: c),
+                    _OverlayMenu(controller: c),
+                    IconButton(tooltip: l10n.actionZoomOut, icon: const Icon(Icons.zoom_out), onPressed: _map.zoomOut),
+                    IconButton(tooltip: l10n.actionZoomIn, icon: const Icon(Icons.zoom_in), onPressed: _map.zoomIn),
+                    IconButton(
+                      tooltip: l10n.actionZoomReset,
+                      icon: const Icon(Icons.center_focus_strong),
+                      onPressed: _map.reset,
+                    ),
+                    if (c.level == null)
+                      IconButton(tooltip: l10n.actionNewGame, icon: const Icon(Icons.restart_alt), onPressed: _newGame),
+                    IconButton(
+                        tooltip: l10n.actionLanguage, icon: const Icon(Icons.translate), onPressed: widget.onLocaleToggle),
+                    IconButton(tooltip: l10n.actionAbout, icon: const Icon(Icons.info_outline), onPressed: _about),
+                  ]
+                : [
+                    _Clock(controller: c, compact: true),
+                    _Transport(controller: c, compact: true),
+                    _OverlayMenu(controller: c),
+                    _MoreMenu(
+                      controller: c,
+                      map: _map,
+                      onNewGame: c.level == null ? _newGame : null,
+                      onLocaleToggle: widget.onLocaleToggle,
+                      onAbout: _about,
+                    ),
+                  ],
           ),
           body: wide ? _wide() : _narrow(),
         );
@@ -169,7 +197,7 @@ class _GameScreenState extends State<GameScreen> {
           Expanded(
             child: Column(
               children: [
-                Expanded(child: Padding(padding: const EdgeInsets.all(8), child: MapView(controller: c))),
+                Expanded(child: Padding(padding: const EdgeInsets.all(8), child: MapView(controller: c, mapController: _map))),
                 _Legend(controller: c),
               ],
             ),
@@ -194,7 +222,7 @@ class _GameScreenState extends State<GameScreen> {
         children: [
           GoalsPanel(controller: c, compact: true),
           IndicatorPanel(controller: c, compact: true),
-          Expanded(child: Padding(padding: const EdgeInsets.all(4), child: MapView(controller: c))),
+          Expanded(child: Padding(padding: const EdgeInsets.all(4), child: MapView(controller: c, mapController: _map))),
           _Legend(controller: c),
           SizedBox(height: 140, child: TileInspector(controller: c)),
           Palette(controller: c, horizontal: true),
@@ -203,8 +231,12 @@ class _GameScreenState extends State<GameScreen> {
 }
 
 class _Clock extends StatelessWidget {
-  const _Clock({required this.controller});
+  const _Clock({required this.controller, this.compact = false});
   final GameController controller;
+
+  /// Narrow layouts drop the date; it is still visible in the goals panel and
+  /// the inspector, and the app bar has no room for it.
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -220,8 +252,10 @@ class _Clock extends StatelessWidget {
         final month = s.tick % 12 + 1;
         return Row(
           children: [
-            Text(l10n.yearMonthLabel(year, month)),
-            const SizedBox(width: 12),
+            if (!compact) ...[
+              Text(l10n.yearMonthLabel(year, month)),
+              const SizedBox(width: 12),
+            ],
             Tooltip(message: l10n.budgetLabel, child: Text(l10n.kEur(n0.format(s.budgetKEur)))),
             const SizedBox(width: 12),
             Tooltip(message: l10n.populationLabel, child: Text('${n0.format(ind.population)} 👥')),
@@ -233,8 +267,11 @@ class _Clock extends StatelessWidget {
 }
 
 class _Transport extends StatelessWidget {
-  const _Transport({required this.controller});
+  const _Transport({required this.controller, this.compact = false});
   final GameController controller;
+
+  /// Narrow layouts show only play/pause and step; speeds live in [_MoreMenu].
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -249,8 +286,9 @@ class _Transport extends StatelessWidget {
             onPressed: controller.togglePlay,
           ),
           IconButton(tooltip: l10n.actionStep, icon: const Icon(Icons.skip_next), onPressed: controller.step),
-          for (final s in GameController.speeds)
-            IconButton(
+          if (!compact)
+            for (final s in GameController.speeds)
+              IconButton(
               tooltip: l10n.actionSpeed(s),
               isSelected: controller.speed == s,
               icon: Text('$s×'),
@@ -318,6 +356,73 @@ class _Legend extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Overflow menu for narrow layouts: speeds, zoom, new game, language, about.
+class _MoreMenu extends StatelessWidget {
+  const _MoreMenu({
+    required this.controller,
+    required this.map,
+    required this.onNewGame,
+    required this.onLocaleToggle,
+    required this.onAbout,
+  });
+
+  final GameController controller;
+  final MapViewController map;
+  final VoidCallback? onNewGame;
+  final VoidCallback onLocaleToggle;
+  final VoidCallback onAbout;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) => PopupMenuButton<VoidCallback>(
+        tooltip: l10n.actionMore,
+        icon: const Icon(Icons.more_vert),
+        onSelected: (action) => action(),
+        itemBuilder: (context) => [
+          for (final s in GameController.speeds)
+            PopupMenuItem(
+              value: () => controller.setSpeed(s),
+              child: ListTile(
+                leading: Icon(controller.speed == s ? Icons.radio_button_checked : Icons.radio_button_off),
+                title: Text(l10n.actionSpeed(s)),
+              ),
+            ),
+          const PopupMenuDivider(),
+          PopupMenuItem(
+            value: map.zoomIn,
+            child: ListTile(leading: const Icon(Icons.zoom_in), title: Text(l10n.actionZoomIn)),
+          ),
+          PopupMenuItem(
+            value: map.zoomOut,
+            child: ListTile(leading: const Icon(Icons.zoom_out), title: Text(l10n.actionZoomOut)),
+          ),
+          PopupMenuItem(
+            value: map.reset,
+            child: ListTile(leading: const Icon(Icons.center_focus_strong), title: Text(l10n.actionZoomReset)),
+          ),
+          const PopupMenuDivider(),
+          if (onNewGame != null)
+            PopupMenuItem(
+              value: onNewGame!,
+              child: ListTile(leading: const Icon(Icons.restart_alt), title: Text(l10n.actionNewGame)),
+            ),
+          PopupMenuItem(
+            value: onLocaleToggle,
+            child: ListTile(leading: const Icon(Icons.translate), title: Text(l10n.actionLanguage)),
+          ),
+          PopupMenuItem(
+            value: onAbout,
+            child: ListTile(leading: const Icon(Icons.info_outline), title: Text(l10n.actionAbout)),
+          ),
+        ],
+      ),
     );
   }
 }

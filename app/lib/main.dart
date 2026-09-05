@@ -39,6 +39,7 @@ class _HectopolisAppState extends State<HectopolisApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       locale: _locale,
       localizationsDelegates: const [
