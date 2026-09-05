@@ -25,7 +25,7 @@ on:
         description: 'Comma-separated iOS simulator names to capture'
         type: string
         required: false
-        default: 'iPhone 16 Pro Max,iPad Pro 13-inch (M4)'
+        default: 'iPhone 17 Pro Max,iPad Pro 13-inch (M5)'
 
 permissions:
   contents: read
@@ -106,10 +106,21 @@ jobs:
               for device in devices:
                   available.setdefault(device['name'], []).append((version(runtime), runtime, device['udid']))
           missing = []
+          def family(n):
+              # 'iPhone 17 Pro Max' -> 'iphone pro max', 'iPad Pro 13-inch (M5)' -> 'ipad pro 13-inch'
+              n = re.sub(r'\s*\([^)]*\)', '', n)
+              n = re.sub(r'\biPhone \d+e?\b', 'iPhone', n)
+              return ' '.join(n.lower().split())
           for name in [n.strip() for n in requested.split(',') if n.strip()]:
               if name not in available:
-                  missing.append(name)
-                  continue
+                  # The runner's Xcode moves on (iPhone 16 -> 17, M4 -> M5): fall
+                  # back to the newest device of the same family.
+                  same = sorted(a for a in available if family(a) == family(name))
+                  if not same:
+                      missing.append(name)
+                      continue
+                  print(f'{name} not present, using {same[-1]}', file=sys.stderr)
+                  name = same[-1]
               _, runtime, udid = sorted(available[name])[-1]  # newest runtime wins
               print(f'{name}\t{udid}\t{runtime}')
           if missing:
@@ -237,8 +248,9 @@ jobs:
           # On Android takeScreenshot() needs convertFlutterSurfaceToImage(),
           # which the test calls; without a real GPU that only works with the
           # swiftshader renderer selected above.
+          # reactivecircus runs this with /usr/bin/sh, so no bashisms here.
           script: |
-            set -euo pipefail
+            set -eu
             adb wait-for-device
             adb shell settings put global window_animation_scale 0
             adb uninstall com.crispstrobe.hectopolis || true

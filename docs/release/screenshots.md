@@ -50,7 +50,7 @@ GitHub → Actions → **screenshots** → *Run workflow*. The one input is the
 comma-separated list of iOS simulator names, default:
 
 ```
-iPhone 16 Pro Max,iPad Pro 13-inch (M4)
+iPhone 17 Pro Max,iPad Pro 13-inch (M5)
 ```
 
 Two independent jobs run (no `needs:` between them, so an Android failure never
@@ -73,11 +73,11 @@ flutter config --no-enable-swift-package-manager
 flutter pub get
 cd app && flutter gen-l10n
 
-xcrun simctl list devices available | grep -E 'iPhone 16 Pro Max|iPad Pro 13'
+xcrun simctl list devices available | grep -E 'iPhone 17 Pro Max|iPad Pro 13'
 xcrun simctl boot <udid>; xcrun simctl bootstatus <udid> -b
 xcrun simctl uninstall <udid> com.crispstrobe.hectopolis   # never drive a stale build
 
-SCREENSHOT_DEVICE="iPhone 16 Pro Max" flutter drive \
+SCREENSHOT_DEVICE="iPhone 17 Pro Max" flutter drive \
   --driver=test_driver/integration_test.dart \
   --target=integration_test/screenshots_test.dart \
   -d <udid>
@@ -135,8 +135,8 @@ other size is derived by Apple from these.
 
 | Set | Device to capture | Pixels | ASC `screenshotDisplayType` |
 |---|---|---|---|
-| 6.9" iPhone | iPhone 16 Pro Max (or 17 Pro Max) | **1320 × 2868** portrait | `APP_IPHONE_67` |
-| 13" iPad | iPad Pro 13-inch (M4) | **2064 × 2752** portrait | `APP_IPAD_PRO_3GEN_129` |
+| 6.9" iPhone | iPhone 17 Pro Max (or 17 Pro Max) | **1320 × 2868** portrait | `APP_IPHONE_67` |
+| 13" iPad | iPad Pro 13-inch (M5) | **2064 × 2752** portrait | `APP_IPAD_PRO_3GEN_129` |
 
 Simulator screenshots of those devices come out at exactly those pixel sizes,
 unscaled — so if `sips -g pixelWidth -g pixelHeight` reports anything else, the
