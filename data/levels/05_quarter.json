@@ -1,0 +1,61 @@
+{
+  "id": "quarter",
+  "order": 5,
+  "budgetKEur": 25000,
+  "turnLimitMonths": 180,
+  "tiles": {
+    "housing_high": null,
+    "housing_low": null,
+    "commercial": null,
+    "park": null,
+    "forest": null,
+    "meadow": null,
+    "water": null,
+    "road": null,
+    "cropland": null
+  },
+  "goals": [
+    {
+      "metric": "population",
+      "min": 3000
+    },
+    {
+      "indicator": "air",
+      "min": 75
+    },
+    {
+      "indicator": "noise",
+      "min": 70
+    },
+    {
+      "indicator": "recreation",
+      "min": 60
+    },
+    {
+      "indicator": "biodiversity",
+      "min": 35
+    },
+    {
+      "indicator": "commuting",
+      "min": 45
+    }
+  ],
+  "map": [
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r...............",
+    "r..............."
+  ]
+}

@@ -5,7 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'game/game_controller.dart';
 import 'game/save_store.dart';
 import 'l10n/generated/app_localizations.dart';
-import 'ui/game_screen.dart';
+import 'ui/level_select_screen.dart';
 
 void main() {
   runApp(const StadtbauApp());
@@ -19,14 +19,9 @@ class StadtbauApp extends StatefulWidget {
 }
 
 class _StadtbauAppState extends State<StadtbauApp> {
-  late final GameController _controller = GameController(store: SaveStore());
+  final SaveStore _store = SaveStore();
+  late final GameController _controller = GameController(store: _store);
   Locale? _locale;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.restore();
-  }
 
   void _toggleLocale() {
     setState(() {
@@ -55,7 +50,7 @@ class _StadtbauAppState extends State<StadtbauApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData(colorSchemeSeed: const Color(0xFF2E7D32), useMaterial3: true),
       darkTheme: ThemeData(colorSchemeSeed: const Color(0xFF2E7D32), brightness: Brightness.dark, useMaterial3: true),
-      home: GameScreen(controller: _controller, onLocaleToggle: _toggleLocale),
+      home: LevelSelectScreen(controller: _controller, store: _store, onLocaleToggle: _toggleLocale),
     );
   }
 }

@@ -93,5 +93,20 @@
   "aboutText": "Stadtbau ist freie Software unter der GNU AGPL v3 oder später, mit einer Zusatzerlaubnis, die den Autoren App-Store-Builds erlaubt. Jeder Modellparameter nennt eine öffentliche Quelle; siehe docs/model im Repository.",
   "aboutLicense": "Lizenz: AGPL-3.0-or-later",
   "legendLow": "niedrig",
-  "legendHigh": "hoch"
+  "legendHigh": "hoch",
+
+  "levelSelectTitle": "Szenario wählen",
+  "actionContinue": "Letztes Spiel fortsetzen",
+  "levelTitle": "{id, select, sandbox{Sandkasten} village{Das Dorf} noise{Wohnen an der Straße} habitat{Biotopverbund} budget{Haushalt sanieren} quarter{Ein neues Quartier} other{Level}}",
+  "levelDescription": "{id, select, sandbox{Freies Spiel auf einer 16 × 16-Karte mit allen Feldern und großzügigem Budget.} village{Ackerland, eine Straße und ein Teich. Baue ein Dorf mit Wohnungen, einem Laden, ruhigen Straßen und Platz für die Natur.} noise{Eine Regionalstraße mit 14 000 Fahrzeugen am Tag und ein Industriegebiet. Bringe 1 200 Menschen unter, ohne sie dem Lärm auszusetzen.} habitat{Zwei Wälder, getrennt durch Felder und eine Straße. Verbinde sie zu einem Lebensraum und halte die bestehenden Häuser attraktiv.} budget{Eine zersiedelte Stadt aus Straßen und Parks fast ohne Einwohner verliert Geld. Hole Wohnungen und Arbeitsplätze, ohne die Luft zu ruinieren.} quarter{Eine leere Wiese mit einer Zufahrtsstraße. Plane ein Quartier für 3 000 Menschen, das sauber, leise, grün und fußläufig ist.} other{}}",
+  "goalsSummary": "{count} Ziele · {months} Monate",
+  "goalsTitle": "Ziele",
+  "goalIndicator": "{name} ≥ {value}",
+  "goalMetric": "{metric, select, population{Einwohner} jobs{Arbeitsplätze} budgetKEur{Haushalt (T€)} other{Wert}} ≥ {value}",
+  "monthsLeft": "noch {count} Monate",
+  "endTitleSuccess": "Alle Ziele erreicht",
+  "endTitleTimeUp": "Die Zeit ist um",
+  "endGoalsMet": "{met} von {total} Zielen erreicht",
+  "actionKeepPlaying": "Weiterspielen",
+  "actionBackToLevels": "Zurück zur Auswahl"
 }

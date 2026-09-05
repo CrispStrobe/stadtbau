@@ -23,10 +23,18 @@ only in `data/params/tiles.json`.
 | dense quarter | air index | 60–85 | 80 |
 | dense quarter | ΔT | 1–2.5 °C | 1.6 |
 | dense quarter | max road traffic | 3 000–10 000 | 4 000 |
+| all levels | solvable with three stars by the plans in `test/level_solutions_test.dart` | yes | yes |
 | industrial park with housing | residents > 55 dB(A) | > 50 % | 63 % |
 | industrial park | housing score | < 30 (jobs without homes) | 15 |
 | mixed town | shopping | > 70 | 84 |
-| mixed town | budget delta | positive | +707 k€/month |
+| mixed town | budget delta | positive | +765 k€/month |
+
+## Performance (T-115)
+
+Dense 24×24 map, 18 700 residents, 16 300 jobs: 38 ms per tick on a heavily
+loaded 4-core VPS (load average ≈ 17), down from 180 ms before routing trips
+per road pair, pruning noise paths and computing fields once per tick.
+Commute (22 ms) and noise (7 ms) dominate; see `benchmark/tick_benchmark.dart`.
 
 ## Open calibration questions
 

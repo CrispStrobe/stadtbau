@@ -1,0 +1,59 @@
+{
+  "id": "noise",
+  "order": 2,
+  "budgetKEur": 9000,
+  "turnLimitMonths": 96,
+  "tiles": {
+    "housing_high": 8,
+    "housing_low": 8,
+    "forest": 14,
+    "park": 3,
+    "commercial": 1,
+    "meadow": null,
+    "road": 4
+  },
+  "goals": [
+    {
+      "indicator": "housing",
+      "min": 70
+    },
+    {
+      "indicator": "noise",
+      "min": 75
+    },
+    {
+      "indicator": "recreation",
+      "min": 60
+    },
+    {
+      "metric": "population",
+      "min": 1200
+    }
+  ],
+  "paramOverrides": {
+    "noise": {
+      "baselineThroughTraffic": {
+        "value": 14000,
+        "source": "level: regional through road"
+      }
+    }
+  },
+  "map": [
+    "IIII............",
+    "IIII............",
+    "IIII............",
+    "IIII............",
+    "................",
+    "rrrrrrrrrrrrrrrr",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "..........ww....",
+    "..........ww....",
+    "................",
+    "................"
+  ]
+}

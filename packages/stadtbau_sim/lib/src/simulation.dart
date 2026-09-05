@@ -158,8 +158,10 @@ class Simulation {
   }
 
   CommandResult _tick(int count) {
+    // Fields are always current at the start of a tick (constructor,
+    // placement and the previous tick recompute them), so stocks advance on
+    // them directly and the fields are recomputed once afterwards.
     for (var k = 0; k < count; k++) {
-      _computeFields();
       final delta = advanceStocks(state, params, fields);
       _lastBudgetDelta = delta.netKEur;
       _computeFields();

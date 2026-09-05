@@ -1,0 +1,138 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+import 'package:flutter/material.dart';
+import 'package:stadtbau_sim/stadtbau_sim.dart';
+
+import '../game/game_controller.dart';
+import '../game/save_store.dart';
+import '../l10n/generated/app_localizations.dart';
+import 'game_screen.dart';
+
+/// Home screen: continue the autosave, play the sandbox or pick a level.
+class LevelSelectScreen extends StatefulWidget {
+  const LevelSelectScreen({
+    super.key,
+    required this.controller,
+    required this.store,
+    required this.onLocaleToggle,
+  });
+
+  final GameController controller;
+  final SaveStore store;
+  final VoidCallback onLocaleToggle;
+
+  @override
+  State<LevelSelectScreen> createState() => _LevelSelectScreenState();
+}
+
+class _LevelSelectScreenState extends State<LevelSelectScreen> {
+  Map<String, int> _stars = {};
+  bool _hasSave = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  Future<void> _refresh() async {
+    final stars = await widget.store.bestStars();
+    final save = await widget.store.load();
+    if (!mounted) return;
+    setState(() {
+      _stars = stars;
+      _hasSave = save != null;
+    });
+  }
+
+  Future<void> _open() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => GameScreen(controller: widget.controller, onLocaleToggle: widget.onLocaleToggle),
+      ),
+    );
+    await _refresh();
+  }
+
+  Future<void> _continue() async {
+    if (await widget.controller.restore()) await _open();
+  }
+
+  void _sandbox() {
+    widget.controller.startSandbox(16);
+    _open();
+  }
+
+  void _level(Level l) {
+    widget.controller.startLevel(l);
+    _open();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.appTitle),
+        actions: [
+          IconButton(tooltip: l10n.actionLanguage, icon: const Icon(Icons.translate), onPressed: widget.onLocaleToggle),
+        ],
+      ),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(l10n.levelSelectTitle, style: theme.textTheme.headlineSmall),
+              const SizedBox(height: 12),
+              if (_hasSave)
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.play_circle),
+                    title: Text(l10n.actionContinue),
+                    onTap: _continue,
+                  ),
+                ),
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.grid_on),
+                  title: Text(l10n.levelTitle('sandbox')),
+                  subtitle: Text(l10n.levelDescription('sandbox')),
+                  onTap: _sandbox,
+                ),
+              ),
+              for (final l in Level.builtIn())
+                Card(
+                  child: ListTile(
+                    leading: _Stars(count: _stars[l.id] ?? 0),
+                    title: Text(l10n.levelTitle(l.id)),
+                    subtitle: Text(
+                      '${l10n.levelDescription(l.id)}\n'
+                      '${l10n.goalsSummary(l.goals.length, l.turnLimitMonths ?? 0)}',
+                    ),
+                    isThreeLine: true,
+                    onTap: () => _level(l),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Stars extends StatelessWidget {
+  const _Stars({required this.count});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < 3; i++)
+            Icon(i < count ? Icons.star : Icons.star_border, size: 18, color: Colors.amber.shade700),
+        ],
+      );
+}

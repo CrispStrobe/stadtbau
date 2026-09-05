@@ -7,6 +7,7 @@ library;
 export 'src/commands.dart';
 export 'src/fields.dart';
 export 'src/indicators.dart';
+export 'src/level.dart';
 export 'src/params.dart';
 export 'src/simulation.dart';
 export 'src/tile_type.dart';

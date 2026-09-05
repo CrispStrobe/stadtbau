@@ -1,0 +1,51 @@
+{
+  "id": "budget",
+  "order": 4,
+  "budgetKEur": 4000,
+  "turnLimitMonths": 72,
+  "tiles": {
+    "housing_high": 6,
+    "housing_low": 6,
+    "commercial": 4,
+    "industry": 2,
+    "road": 4,
+    "park": 1,
+    "meadow": null
+  },
+  "goals": [
+    {
+      "indicator": "economy",
+      "min": 75
+    },
+    {
+      "metric": "population",
+      "min": 1000
+    },
+    {
+      "metric": "budgetKEur",
+      "min": 1000
+    },
+    {
+      "indicator": "air",
+      "min": 60
+    }
+  ],
+  "map": [
+    "................",
+    ".rrrrrrrrrrrrrr.",
+    ".r....p.....p.r.",
+    ".r..hh..........",
+    ".r..hh.....pp.r.",
+    ".r.........pp.r.",
+    ".r......p.....r.",
+    ".rrrrrrrrrrrrrr.",
+    ".r......p.....r.",
+    ".r..pp........r.",
+    ".r..pp..hh....r.",
+    ".r......hh....r.",
+    ".r............r.",
+    ".r....p....p..r.",
+    ".rrrrrrrrrrrrrr.",
+    "................"
+  ]
+}

@@ -125,5 +125,27 @@
   "aboutText": "Stadtbau is free software under the GNU AGPL v3 or later, with an additional permission that lets the authors publish app-store builds. Every model parameter cites a public source; see docs/model in the repository.",
   "aboutLicense": "License: AGPL-3.0-or-later",
   "legendLow": "low",
-  "legendHigh": "high"
+  "legendHigh": "high",
+
+  "levelSelectTitle": "Choose a scenario",
+  "actionContinue": "Continue last game",
+  "levelTitle": "{id, select, sandbox{Sandbox} village{The village} noise{Living by the road} habitat{Habitat corridor} budget{Balance the books} quarter{A new quarter} other{Level}}",
+  "@levelTitle": {"placeholders": {"id": {"type": "String"}}},
+  "levelDescription": "{id, select, sandbox{Free play on a 16 × 16 map with every tile and a generous budget.} village{Farmland, a road and a pond. Build a village that has homes, a shop, quiet streets and room for nature.} noise{A regional road with 14 000 vehicles a day and an industrial estate. House 1 200 people without exposing them to noise.} habitat{Two forests cut off by fields and a road. Connect them into one habitat while keeping the existing homes attractive.} budget{A sprawling town of roads and parks with almost no residents is losing money. Bring in homes and jobs without ruining the air.} quarter{An empty meadow with one access road. Plan a quarter for 3 000 people that is clean, quiet, green and walkable.} other{}}",
+  "@levelDescription": {"placeholders": {"id": {"type": "String"}}},
+  "goalsSummary": "{count} goals · {months} months",
+  "@goalsSummary": {"placeholders": {"count": {"type": "int"}, "months": {"type": "int"}}},
+  "goalsTitle": "Goals",
+  "goalIndicator": "{name} ≥ {value}",
+  "@goalIndicator": {"placeholders": {"name": {"type": "String"}, "value": {"type": "String"}}},
+  "goalMetric": "{metric, select, population{Residents} jobs{Jobs} budgetKEur{Budget (k€)} other{Value}} ≥ {value}",
+  "@goalMetric": {"placeholders": {"metric": {"type": "String"}, "value": {"type": "String"}}},
+  "monthsLeft": "{count} months left",
+  "@monthsLeft": {"placeholders": {"count": {"type": "int"}}},
+  "endTitleSuccess": "All goals reached",
+  "endTitleTimeUp": "Time is up",
+  "endGoalsMet": "{met} of {total} goals met",
+  "@endGoalsMet": {"placeholders": {"met": {"type": "int"}, "total": {"type": "int"}}},
+  "actionKeepPlaying": "Keep playing",
+  "actionBackToLevels": "Back to scenarios"
 }

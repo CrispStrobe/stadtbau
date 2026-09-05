@@ -8,29 +8,48 @@ import 'package:stadtbau/main.dart';
 import 'package:stadtbau_sim/stadtbau_sim.dart';
 
 void main() {
-  testWidgets('app renders palette, map and indicators', (tester) async {
+  testWidgets('level select opens the sandbox with palette, map and indicators', (tester) async {
     SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = const Size(1400, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     await tester.pumpWidget(const StadtbauApp());
     await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.grid_on), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.grid_on));
+    await tester.pumpAndSettle();
     expect(find.byType(CustomPaint), findsWidgets);
     expect(find.byIcon(Icons.forest), findsOneWidget);
     expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+  });
+
+  testWidgets('a level shows its goals', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpWidget(const StadtbauApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.star_border).first);
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.radio_button_unchecked), findsWidgets);
   });
 
   test('autosave round trip restores the world', () async {
     SharedPreferences.setMockInitialValues({});
     final store = SaveStore();
     final c = GameController(size: 8, store: store);
-    c.place(2, 2, TileType.forest);
+    c.startLevel(Level.byId('village')!);
+    c.place(0, 0, TileType.housingLow);
     c.step();
-    await store.save(c.sim);
+    await store.save('village', c.sim);
     final restored = GameController(size: 8, store: store);
-    await restored.restore();
-    expect(restored.sim.state.tileAt(2, 2), TileType.forest);
+    expect(await restored.restore(), isTrue);
+    expect(restored.level?.id, 'village');
+    expect(restored.sim.state.tileAt(0, 0), TileType.housingLow);
     expect(restored.sim.state.tick, 1);
+    expect(restored.sim.tileBudget.remaining(TileType.housingLow), 15);
+    expect(restored.progress, isNotNull);
     c.dispose();
     restored.dispose();
   });

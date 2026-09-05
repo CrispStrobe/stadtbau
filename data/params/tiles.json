@@ -691,8 +691,9 @@
         "source": "Hauptstraße ~2–4 M€/km inkl. Knoten → 100 m Abschnitt (initial estimate)"
       },
       "maintenanceKEurYear": {
-        "value": 25,
-        "source": "Straßenunterhalt ~2 €/m² Fahrbahn/a (initial estimate)"
+        "value": 10,
+        "source": "Straßenerhaltung 1.5–3 €/m² Fahrbahn/a (Difu/KfW Kommunalpanel: Erhaltungsbedarf) für ~2 000 m² Fahrbahn je 100 m Hauptstraße plus Beleuchtung, Reinigung, Winterdienst ≈ 10 k€/a",
+        "note": "initial estimate"
       }
     }
   },
@@ -942,6 +943,10 @@
     "workingDaysPerMonth": {
       "value": 20,
       "source": "convention"
+    },
+    "referenceCommuteKm": {
+      "value": 20,
+      "source": "MiD 2017: mean one-way commute ≈ 16–17 km; a mean of 20 km scores zero on the distance half of the commuting indicator"
     }
   },
   "economy": {

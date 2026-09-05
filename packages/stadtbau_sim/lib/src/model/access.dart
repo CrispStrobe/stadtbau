@@ -21,9 +21,19 @@ void computeAccess(WorldState w, SimParams p, Fields f) {
 
   // Job access uses the whole map (kernel decays smoothly).
   final jobCells = <int>[];
+  final jobCounts = <double>[];
   for (var i = 0; i < n; i++) {
-    if (p.tile(w.tiles[i]).jobsPerHa.value > 0) jobCells.add(i);
+    final jobs = p.tile(w.tiles[i]).jobsPerHa.value;
+    if (jobs > 0) {
+      jobCells.add(i);
+      jobCounts.add(jobs);
+    }
   }
+  final decay = DecayTable(
+    maxDist2: w.width * w.width + w.height * w.height,
+    cellSizeM: p.cellSizeM,
+    decayM: ap.jobDecayM,
+  );
 
   for (var i = 0; i < n; i++) {
     final x = i % width;
@@ -61,11 +71,11 @@ void computeAccess(WorldState w, SimParams p, Fields f) {
     f.retailAccess[i] = clamp01(supply / ap.retailReferenceSupply);
 
     var jobs = 0.0;
-    for (final j in jobCells) {
+    for (var k = 0; k < jobCells.length; k++) {
+      final j = jobCells[k];
       final dx = (j % width) - x;
       final dy = (j ~/ width) - y;
-      final dM = math.sqrt((dx * dx + dy * dy).toDouble()) * p.cellSizeM;
-      jobs += p.tile(w.tiles[j]).jobsPerHa.value * math.exp(-dM / ap.jobDecayM);
+      jobs += jobCounts[k] * decay[dx * dx + dy * dy];
     }
     f.jobAccess[i] = clamp01(jobs / ap.jobReferenceJobs);
   }

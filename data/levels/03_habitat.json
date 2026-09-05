@@ -1,0 +1,30 @@
+{
+  "id": "habitat",
+  "order": 3,
+  "budgetKEur": 4000,
+  "turnLimitMonths": 240,
+  "tiles": { "forest": 12, "meadow": null, "water": 2, "park": 2, "cropland": null },
+  "goals": [
+    { "indicator": "biodiversity", "min": 70 },
+    { "indicator": "housing", "min": 50 },
+    { "indicator": "recreation", "min": 60 }
+  ],
+  "map": [
+    "ffffcccccccccccc",
+    "ffffcccccccccccc",
+    "ffffcccccccccccc",
+    "ffffcccccccccccc",
+    "cccccccccccccccc",
+    "cccccccccccccccc",
+    "rrrrrrrrrrrrrrrr",
+    "cchhhhcccccccccc",
+    "cchhhhcccccccccc",
+    "ccccccccccccccff",
+    "ccccccccccccffff",
+    "ccccccccccccffff",
+    "ccccccccccccffff",
+    "cccccccccccccccc",
+    "cccccccccccccccc",
+    "cccccccccccccccc"
+  ]
+}

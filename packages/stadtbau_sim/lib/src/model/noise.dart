@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import '../fields.dart';
 import '../geometry.dart';
@@ -34,20 +35,36 @@ void computeNoise(WorldState w, SimParams p, Fields f) {
     return base;
   }
 
-  double pathAttenuation(int sx, int sy, int rx, int ry) {
+  // Per-tile attenuation contribution, looked up by tile type.
+  final attenuationOf = List<double>.filled(TileType.values.length, 0);
+  for (final t in TileType.values) {
+    final cat = p.tile(t).category;
+    if (t == TileType.forest || t == TileType.park) {
+      attenuationOf[t.index] = np.foliageAttenuationDbPerTile;
+    } else if (cat == TileCategory.work || t == TileType.housingHigh) {
+      attenuationOf[t.index] = np.buildingScreeningDbPerTile;
+    }
+  }
+
+  double pathAttenuation(int sx, int sy, int k) {
     var att = 0.0;
-    for (final c in cellsBetween(sx, sy, rx, ry, width)) {
-      final cat = p.tile(w.tiles[c]).category;
-      final t = w.tiles[c];
-      if (t == TileType.forest || t == TileType.park) {
-        att += np.foliageAttenuationDbPerTile;
-      } else if (cat == TileCategory.work || t == TileType.housingHigh) {
-        att += np.buildingScreeningDbPerTile;
-      }
+    final path = offsets.pathOffsets[k];
+    for (var i = 0; i < path.length; i += 2) {
+      final c = (sy + path[i + 1]) * width + sx + path[i];
+      att += attenuationOf[w.tiles[c].index];
       if (att >= np.maxPathAttenuationDb) return np.maxPathAttenuationDb;
     }
     return att;
   }
+
+  // Free-field level per offset is the same for every source: precompute.
+  final divergence = Float64List(offsets.length);
+  for (var k = 0; k < offsets.length; k++) {
+    final dM = offsets.dist[k] * p.cellSizeM;
+    divergence[k] =
+        np.areaDecayDbPerDecade * _log10(math.max(dM, np.areaReferenceDistanceM) / np.areaReferenceDistanceM);
+  }
+  final cutoff = np.backgroundDb - 15;
 
   for (var s = 0; s < n; s++) {
     final e = emissionOf(s);
@@ -59,12 +76,10 @@ void computeNoise(WorldState w, SimParams p, Fields f) {
       final rx = sx + offsets.dx[k];
       final ry = sy + offsets.dy[k];
       if (!w.inBounds(rx, ry)) continue;
-      final dM = offsets.dist[k] * p.cellSizeM;
-      var level = e -
-          np.areaDecayDbPerDecade *
-              _log10(math.max(dM, np.areaReferenceDistanceM) / np.areaReferenceDistanceM);
-      level -= pathAttenuation(sx, sy, rx, ry);
-      if (level <= np.backgroundDb - 15) continue;
+      var level = e - divergence[k];
+      if (level <= cutoff) continue;
+      level -= pathAttenuation(sx, sy, k);
+      if (level <= cutoff) continue;
       energy[ry * width + rx] += math.pow(10, level / 10).toDouble();
     }
   }

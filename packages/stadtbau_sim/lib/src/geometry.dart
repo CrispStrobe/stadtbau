@@ -15,6 +15,29 @@ class Offsets {
 
   int get length => dx.length;
 
+  /// For offset k, the relative cells strictly between the centre and the
+  /// offset on a Bresenham line, as interleaved (dx, dy) pairs. Computed once.
+  late final List<Int32List> pathOffsets = _buildPaths();
+
+  List<Int32List> _buildPaths() {
+    final result = <Int32List>[];
+    for (var k = 0; k < length; k++) {
+      final cells = cellsBetween(0, 0, dx[k], dy[k], 1 << 16);
+      final packed = Int32List(cells.length * 2);
+      for (var i = 0; i < cells.length; i++) {
+        // cellsBetween packs y * width + x with width 2^16 and negative x
+        // wrapping; decode with the same width.
+        final v = cells[i];
+        final y = (v / (1 << 16)).round();
+        final x = v - y * (1 << 16);
+        packed[2 * i] = x;
+        packed[2 * i + 1] = y;
+      }
+      result.add(packed);
+    }
+    return result;
+  }
+
   static final Map<int, Offsets> _cache = {};
 
   static Offsets radius(int r) => _cache[r] ??= _build(r);
@@ -108,3 +131,18 @@ class DisjointSet {
 }
 
 double clamp01(double v) => v < 0 ? 0 : (v > 1 ? 1 : v);
+
+/// Lookup table of exp(−sqrt(d²) · cellSizeM / decayM) indexed by squared
+/// tile distance, so that gravity kernels avoid exp() in inner loops.
+class DecayTable {
+  DecayTable({required int maxDist2, required double cellSizeM, required double decayM})
+      : values = Float64List(maxDist2 + 1) {
+    for (var d2 = 0; d2 <= maxDist2; d2++) {
+      values[d2] = math.exp(-math.sqrt(d2.toDouble()) * cellSizeM / decayM);
+    }
+  }
+
+  final Float64List values;
+
+  double operator [](int d2) => values[d2];
+}

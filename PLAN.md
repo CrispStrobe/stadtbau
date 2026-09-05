@@ -280,8 +280,9 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   (e.g. dense quarter noise exposure 55–65 dB, suburb car share 0.6–0.8). Adjust
   coefficients only via `data/params/`.
   *Note 2026-09-05 (2):* `tool/calibrate.dart` with seven archetypes; ranges and results in `docs/model/calibration.md`. Climate score changed to per-person CO₂.
-- [ ] **T-115 Performance.** 24×24 map full tick < 16 ms on desktop, < 50 ms on a mid
+- [~] **T-115 Performance.** 24×24 map full tick < 16 ms on desktop, < 50 ms on a mid
   Android phone (measure with `benchmark_harness`). Optimise kernels if needed.
+  *Note 2026-09-05 (3):* 180 → 38 ms per tick on a loaded VPS (`benchmark/tick_benchmark.dart`); desktop and phone targets still to measure on real hardware.
 
 ### Phase 2 — Game UI (`app/`)
 
@@ -315,17 +316,20 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
 
 ### Phase 3 — Levels and content
 
-- [ ] **T-301 Level format.** JSON level: grid size, initial map, allowed tiles with
+- [x] **T-301 Level format.** JSON level: grid size, initial map, allowed tiles with
   counts, starting budget, goals (indicator thresholds), turn limit. Loader + validation.
-- [ ] **T-302 Five starter levels.** Sandbox 16×16; "Dorf" (village, limited tiles);
+  *Note 2026-09-05 (3):* `Level` in the sim package: ASCII map, tile counts, goals (indicator or metric), turn limit, param overrides; levels in `data/levels/*.json` mirrored by the generator.
+- [x] **T-302 Five starter levels.** Sandbox 16×16; "Dorf" (village, limited tiles);
   "Lärmschutz" (existing road, place housing); "Biotopverbund" (connect two forests);
   "Haushalt" (balance the budget). Goal texts in ARB.
+  *Note 2026-09-05 (3):* Five levels: village, noise, habitat, budget, quarter. `test/level_solutions_test.dart` proves each is solvable with three stars.
 - [ ] **T-303 Level generator from open data (optional).** Script under `tools/` that
   converts a Copernicus Urban Atlas or ATKIS extract (stored in
   `/mnt/storage/code/stadtbau/data`, never committed) into a level JSON. Document the data
   license and attribution text required in-game.
-- [ ] **T-304 Scoring and end screen.** Level goals evaluation, star rating, replay
+- [x] **T-304 Scoring and end screen.** Level goals evaluation, star rating, replay
   summary of indicator curves.
+  *Note 2026-09-05 (3):* Goals panel with live progress, end dialog with 0–3 stars, best stars stored per level; level select screen with continue.
 
 ### Phase 4 — Platforms and release
 

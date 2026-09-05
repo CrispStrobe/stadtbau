@@ -25,6 +25,14 @@ void computeCommute(WorldState w, SimParams p, Fields f) {
   final cellKm = p.cellSizeM / 1000.0;
 
   final network = _RoadNetwork(w, cp.roadSearchRadiusTiles);
+  final decay = DecayTable(
+    maxDist2: w.width * w.width + w.height * w.height,
+    cellSizeM: p.cellSizeM,
+    decayM: p.access.jobDecayM,
+  );
+  // Trips aggregated per (origin road, destination road) before routing.
+  final pairTrips = <int, double>{};
+  final externalTrips = <int, double>{};
 
   // Job cells.
   final jobCells = <int>[];
@@ -70,8 +78,7 @@ void computeCommute(WorldState w, SimParams p, Fields f) {
       final j = jobCells[k];
       final dx = (j % width) - x;
       final dy = (j ~/ width) - y;
-      final dM = math.sqrt((dx * dx + dy * dy).toDouble()) * p.cellSizeM;
-      final wk = jobCounts[k] * math.exp(-dM / p.access.jobDecayM);
+      final wk = jobCounts[k] * decay[dx * dx + dy * dy];
       weights[k] = wk;
       wsum += wk;
     }
@@ -91,7 +98,12 @@ void computeCommute(WorldState w, SimParams p, Fields f) {
         final cars = commuters * cp.carShare(km);
         carTrips += cars;
         totalCarKm += cars * km * 2;
-        network.assign(traffic, i, j, cars * 2);
+        final ro = network.nearestRoad[i];
+        final rd = network.nearestRoad[j];
+        if (ro >= 0 || rd >= 0) {
+          final key = (ro >= 0 ? ro : rd) * n + (rd >= 0 ? rd : ro);
+          pairTrips[key] = (pairTrips[key] ?? 0) + cars * 2;
+        }
       }
     }
     final external = cellWorkers - localWorkers;
@@ -99,7 +111,8 @@ void computeCommute(WorldState w, SimParams p, Fields f) {
       final cars = external * cp.externalCarShare;
       carTrips += cars;
       totalCarKm += cars * cp.externalCommuteKm * 2;
-      network.assignExternal(traffic, i, cars * 2);
+      final r = network.nearestRoad[i];
+      if (r >= 0) externalTrips[r] = (externalTrips[r] ?? 0) + cars * 2;
     }
     final fLocal = cellWorkers > 0 ? localWorkers / cellWorkers : 0.0;
     f.meanCommuteKm[i] = fLocal * meanKm + (1 - fLocal) * cp.externalCommuteKm;
@@ -112,8 +125,16 @@ void computeCommute(WorldState w, SimParams p, Fields f) {
       final share = jobCounts[k] / jobsCapacity;
       final cars = inCommuters * share * cp.externalCarShare;
       totalCarKm += cars * cp.externalCommuteKm * 2;
-      network.assignExternal(traffic, jobCells[k], cars * 2);
+      final r = network.nearestRoad[jobCells[k]];
+      if (r >= 0) externalTrips[r] = (externalTrips[r] ?? 0) + cars * 2;
     }
+  }
+
+  for (final e in pairTrips.entries) {
+    network.assignRoads(traffic, e.key ~/ n, e.key % n, e.value);
+  }
+  for (final e in externalTrips.entries) {
+    network.assignExternalRoad(traffic, e.key, e.value);
   }
 
   f.totalCarKmPerDay = totalCarKm;
@@ -201,18 +222,10 @@ class _RoadNetwork {
     return parent;
   }
 
-  /// Add [trips] to every road cell on the shortest road path between the
-  /// nearest roads of [origin] and [dest]. Unreachable pairs load only the
-  /// two access cells.
-  void assign(Float64List traffic, int origin, int dest, double trips) {
+  /// Add [trips] to every road cell on the shortest road path between road
+  /// cells [ro] and [rd]. Unreachable pairs load only the two access cells.
+  void assignRoads(Float64List traffic, int ro, int rd, double trips) {
     if (trips <= 0) return;
-    final ro = nearestRoad[origin];
-    final rd = nearestRoad[dest];
-    if (ro < 0 && rd < 0) return;
-    if (ro < 0 || rd < 0) {
-      traffic[ro >= 0 ? ro : rd] += trips;
-      return;
-    }
     if (ro == rd) {
       traffic[ro] += trips;
       return;
@@ -230,11 +243,10 @@ class _RoadNetwork {
     }
   }
 
-  /// Trips that leave or enter the map: routed to the nearest border road.
-  void assignExternal(Float64List traffic, int cell, double trips) {
+  /// Trips that leave or enter the map at road cell [r]: routed to the
+  /// nearest border road.
+  void assignExternalRoad(Float64List traffic, int r, double trips) {
     if (trips <= 0) return;
-    final r = nearestRoad[cell];
-    if (r < 0) return;
     if (exits.isEmpty) {
       traffic[r] += trips;
       return;

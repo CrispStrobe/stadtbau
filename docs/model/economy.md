@@ -30,7 +30,8 @@ Revenue = residents × (550 + 180) / 12 + filled jobs × 2 100 / 12, in €:
 - 2 100 €/job/a: Gewerbesteuer 75.1 bn € (2023) ÷ ≈ 35 M sozialversicherungs-
   pflichtig Beschäftigte (Destatis PM 356/2024).
 
-Costs = Σ maintenance per tile / 12 (road 25 k€/ha/a, park 20, others 0–4) plus
+Costs = Σ maintenance per tile / 12 (road 10 k€/ha/a: 1.5–3 €/m² Fahrbahn plus
+Beleuchtung, Reinigung, Winterdienst; park 20; others 0–4) plus
 one-off build and demolition costs at placement. Starting budget 25 M€.
 
 ## CO₂ balance (t/a)

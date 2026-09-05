@@ -171,7 +171,9 @@ IndicatorSnapshot computeIndicators(
     economy = 100 * (0.6 * jobsRatio + 0.4 * trend);
   }
 
-  final commuting = hasResidents ? 100 * (0.5 * (1 - clamp01(commuteKm / 10)) + 0.5 * (1 - carShare)) : 0.0;
+  final commuting = hasResidents
+      ? 100 * (0.5 * (1 - clamp01(commuteKm / p.commute.referenceCommuteKm)) + 0.5 * (1 - carShare))
+      : 0.0;
 
   // CO₂ per person (residents + jobs), floored at a tenth of the cell count
   // so that empty maps are judged by their absolute balance. 2.5 t/person/a

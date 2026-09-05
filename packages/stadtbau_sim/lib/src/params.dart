@@ -242,6 +242,7 @@ class CommuteParams {
         externalCarShare = _p(m, 'externalCarShare', 'commute').value,
         carKgCo2PerKm = _p(m, 'carKgCo2PerKm', 'commute').value,
         workingDaysPerMonth = _p(m, 'workingDaysPerMonth', 'commute').value,
+        referenceCommuteKm = _p(m, 'referenceCommuteKm', 'commute', 20).value,
         modeShareBins = [
           for (final b in (_map(m['modeShareByDistance'], 'commute.modeShareByDistance')['bins'] as List<dynamic>)
               .cast<Map<String, dynamic>>())
@@ -259,6 +260,7 @@ class CommuteParams {
   final double externalCarShare;
   final double carKgCo2PerKm;
   final double workingDaysPerMonth;
+  final double referenceCommuteKm;
   final List<ModeShareBin> modeShareBins;
 
   /// Car share for a one-way commute of [km].
