@@ -334,8 +334,9 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
 
 ### Phase 4 — Platforms and release
 
-- [ ] **T-401 Web release build** to `/mnt/storage/code/stadtbau/build/web`, deploy target
+- [x] **T-401 Web release build** to `/mnt/storage/code/stadtbau/build/web`, deploy target
   (static host). PWA manifest, icons (self-made).
+  *Note 2026-09-05:* GitHub Pages at https://crispstrobe.github.io/stadtbau/ via `.github/workflows/pages.yml` (base href from the repo name). PWA manifest and own icons still open.
 - [ ] **T-402 Android.** SDK setup on a build machine, signing config outside the repo,
   `flutter build appbundle`. Verify AGPL notice screen (license text + sources) in-app.
 - [ ] **T-403 iOS / macOS.** Requires a Mac runner. Document steps; Xcode project settings;
