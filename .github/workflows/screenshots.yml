@@ -94,7 +94,7 @@ jobs:
       # Resolve the requested simulator names to UDIDs and boot them. `simctl
       # boot` can outlive its own timeout while succeeding, so the state is
       # confirmed with `bootstatus -b` instead of trusting the exit code.
-      - name: Boot the simulators
+      - name: Resolve the simulators
         env:
           DEVICES: ${{ inputs.devices }}
         run: |
@@ -137,29 +137,42 @@ jobs:
               sys.exit(1)
           PY
           cat "$RUNNER_TEMP/simulators.tsv"
-          while IFS=$'\t' read -r name udid runtime; do
-            echo "== booting $name ($udid, $runtime)"
-            xcrun simctl boot "$udid" || true
-            xcrun simctl bootstatus "$udid" -b
-          done < "$RUNNER_TEMP/simulators.tsv"
-          xcrun simctl list devices | grep Booted || true
+          # Devices are booted one at a time in the drive step: with two
+          # simulators up, flutter drive on the second one never connected
+          # (run 33991381211 hung 30 min after "Xcode build done").
 
       # One `flutter drive` per simulator. The app is uninstalled first: when a
       # fresh build fails, `flutter drive` happily connects to whatever is
       # already installed and drives *that*, producing confidently wrong
       # screenshots of an old binary.
       - name: Drive the tour on each simulator
+        id: drive
         working-directory: app
         run: |
           set -euo pipefail
+          failed=()
           while IFS=$'\t' read -r name udid runtime; do
             echo "== $name ($udid, $runtime)"
+            xcrun simctl boot "$udid" || true
+            xcrun simctl bootstatus "$udid" -b
             xcrun simctl uninstall "$udid" "$BUNDLE_ID" || true
-            SCREENSHOT_DEVICE="$name" flutter drive \
-              --driver=test_driver/integration_test.dart \
-              --target=integration_test/screenshots_test.dart \
-              -d "$udid"
+            # One device at a time, and a hang on one device must not cost the
+            # others: 25 minutes is ample for build + tour on a fresh runner.
+            if SCREENSHOT_DEVICE="$name" timeout 25m flutter drive \
+                --driver=test_driver/integration_test.dart \
+                --target=integration_test/screenshots_test.dart \
+                -d "$udid"; then
+              echo "== $name: ok"
+            else
+              echo "::error::$name: flutter drive failed or timed out"
+              failed+=("$name")
+            fi
+            xcrun simctl shutdown "$udid" || true
           done < "$RUNNER_TEMP/simulators.tsv"
+          if [ "${#failed[@]}" -gt 0 ]; then
+            echo "::warning::devices without screenshots: ${failed[*]}"
+            echo "failed_devices=${failed[*]}" >> "$GITHUB_OUTPUT"
+          fi
 
       # Apple wants 1320x2868 for the 6.9" iPhone set (APP_IPHONE_67) and
       # 2064x2752 for the 13" iPad set (APP_IPAD_PRO_3GEN_129). A simulator of
@@ -485,6 +498,24 @@ jobs:
         with:
           name: screenshots-ios
           path: screenshots-ios
+
+      # App Store Connect rejects PNGs with an alpha channel; the Simulator
+      # captures RGBA. Flatten onto white in place.
+      - name: Flatten the PNGs to RGB
+        if: env.HAS_APP_ID == 'true'
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check pillow
+          python3 - <<'PY'
+          import glob
+          from PIL import Image
+          for f in sorted(glob.glob('screenshots-ios/**/*.png', recursive=True)):
+              im = Image.open(f)
+              if im.mode != 'RGB':
+                  bg = Image.new('RGB', im.size, (255, 255, 255))
+                  bg.paste(im, mask=im.getchannel('A') if 'A' in im.getbands() else None)
+                  bg.save(f, optimize=True)
+                  print('flattened', f)
+          PY
 
       # A dry run first: it prints the whole plan (which file goes to which
       # locale, set and position) and the version it found, so a wrong mapping
