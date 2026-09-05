@@ -1,0 +1,10 @@
+name: stadtbau_workspace
+description: Pub workspace root for the Stadtbau game (app + packages).
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+workspace:
+  - app
+  - packages/stadtbau_sim

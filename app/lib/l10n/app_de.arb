@@ -1,0 +1,97 @@
+{
+  "@@locale": "de",
+  "appTitle": "Stadtbau",
+
+  "tileName": "{id, select, meadow{Wiese} cropland{Acker} forest{Wald} water{Gewässer} park{Park} housing_low{Einfamilienhäuser} housing_high{Mehrfamilienhäuser} commercial{Gewerbe & Einzelhandel} industry{Industrie} road{Hauptstraße} other{Unbekannt}}",
+
+  "tileDescription": "{id, select, meadow{Extensives Grünland. Günstig, ordentlicher Lebensraum, kühlt etwas.} cropland{Ackerland. Geringer Biotopwert, kleine CO₂-Quelle.} forest{Laubwald. Bester Lebensraum, bindet CO₂, dämpft Lärm und Staub. Reift über Jahrzehnte.} water{Teich oder See. Guter Lebensraum, kühlt die Umgebung.} park{Stadtpark. Erholung im 300-m-Umkreis, Kühlung, etwas Lebensraum.} housing_low{Einfamilienhäuser, etwa 45 Einwohner je Hektar.} housing_high{Mehrfamilienhäuser, etwa 180 Einwohner je Hektar mit Erdgeschossnutzung.} commercial{Büros und Läden. Arbeitsplätze, Einkaufen zu Fuß, Lieferverkehr.} industry{Produzierendes Gewerbe. Viele Arbeitsplätze, Lärm, Emissionen.} road{Hauptstraße. Verbindet Wohnen und Arbeit; Verkehr erzeugt Lärm und Abgase.} other{}}",
+
+  "categoryName": "{id, select, nature{Landschaft} green_urban{Stadtgrün} residential{Wohnen} work{Arbeit} infrastructure{Infrastruktur} other{Sonstiges}}",
+
+  "indicatorName": "{id, select, biodiversity{Biodiversität} air{Luftqualität} noise{Ruhe} housing{Wohnraum} economy{Wirtschaft} shopping{Einkaufen} recreation{Erholung} commuting{Pendeln} climate{Klima} budget{Haushalt} other{Unbekannt}}",
+
+  "indicatorHint": "{id, select, biodiversity{Habitatqualität und Vernetzung der Grünflächen (Biotopwerte der BKompV, InVEST Habitat Quality).} air{Einwohnergewichteter Schadstoffindex aus Verkehr, Industrie und Heizung; Vegetation baut einen Teil ab.} noise{Anteil der Einwohner unter dem Tagesrichtwert von 55 dB(A) für Wohngebiete (TA Lärm).} housing{Wohnkapazität im Verhältnis zu den Arbeitsplätzen vor Ort und ihre Auslastung.} economy{Arbeitsplätze für die Einwohner und die Entwicklung des Haushalts.} shopping{Einzelhandel in Gehweite (Huff-Modell, 700 m).} recreation{Grünflächen im 300-m-Umkreis (WHO) und sommerliche Kühlung.} commuting{Mittlere Pendeldistanz und Pkw-Anteil (Verkehrsmittelwahl nach MiD 2017).} climate{CO₂-Bilanz aus Flächennutzung und Verkehr sowie städtische Überwärmung.} budget{Gemeindehaushalt im Verhältnis zum Startbudget.} other{}}",
+
+  "overlayName": "{id, select, none{Kein Overlay} noise{Lärm} air{Luftschadstoffe} heat{Hitze} green{Grünzugang} retail{Einkaufszugang} jobs{Arbeitsplatzzugang} habitat{Habitatqualität} traffic{Verkehr} attractiveness{Attraktivität} other{}}",
+
+  "overlayUnit": "{id, select, noise{dB(A)} air{Index} heat{°C über Umland} green{0–1} retail{0–1} jobs{0–1} habitat{0–1} traffic{Kfz/Tag} attractiveness{0–1} other{}}",
+
+  "overlayLabel": "Overlay",
+  "paletteTitle": "Felder",
+  "paletteHint": "Feld auf die Karte ziehen oder auswählen und Zellen antippen. Lange drücken leert eine Zelle.",
+  "indicatorsTitle": "Kennzahlen",
+  "inspectorTitle": "Zelle {x}, {y}",
+  "inspectorEmpty": "Zelle antippen, um Details zu sehen.",
+
+  "costLabel": "Kosten {amount}",
+  "remainingLabel": "{count} übrig",
+  "unlimited": "unbegrenzt",
+
+  "budgetLabel": "Haushalt",
+  "populationLabel": "Einwohner",
+  "jobsLabel": "Arbeitsplätze",
+  "monthLabel": "Monat {tick}",
+  "yearMonthLabel": "Jahr {year}, Monat {month}",
+
+  "kEur": "{amount} T€",
+  "perMonth": "{amount} / Monat",
+
+  "actionPlay": "Start",
+  "actionPause": "Pause",
+  "actionStep": "Nächster Monat",
+  "actionSpeed": "Tempo {factor}×",
+  "actionNewGame": "Neues Spiel",
+  "actionClear": "Zelle leeren",
+  "actionLanguage": "Sprache",
+  "actionAbout": "Über",
+
+  "newGameTitle": "Neues Spiel",
+  "newGameSize": "Kartengröße {size} × {size}",
+  "cancel": "Abbrechen",
+  "ok": "OK",
+
+  "errorOutOfBounds": "Außerhalb der Karte.",
+  "errorSameTile": "Diese Zelle hat dieses Feld bereits.",
+  "errorInsufficientBudget": "Nicht genug Budget.",
+  "errorTileNotAllowed": "Dieses Feld ist in diesem Level nicht verfügbar.",
+  "errorTileExhausted": "Keine Felder dieses Typs mehr übrig.",
+
+  "fieldNoise": "Lärm",
+  "fieldAir": "Luftqualität",
+  "fieldHeat": "Überwärmung",
+  "fieldGreen": "Grünzugang",
+  "fieldRetail": "Einkaufszugang",
+  "fieldJobs": "Arbeitsplatzzugang",
+  "fieldHabitat": "Habitatqualität",
+  "fieldTraffic": "Verkehr",
+  "fieldAttractiveness": "Attraktivität",
+  "fieldResidents": "Einwohner",
+  "fieldCommute": "Mittlerer Arbeitsweg",
+  "fieldCarShare": "Pkw-Anteil",
+  "fieldAge": "Alter",
+  "fieldConnected": "Straßenanschluss",
+  "yes": "ja",
+  "no": "nein",
+  "months": "{count} Monate",
+  "dbValue": "{value} dB(A)",
+  "degreesValue": "+{value} °C",
+  "kmValue": "{value} km",
+  "percentValue": "{value} %",
+  "vehiclesValue": "{value} Kfz/Tag",
+  "tonsPerYear": "{value} t CO₂/Jahr",
+
+  "statsPopulation": "{count} Einwohner",
+  "statsJobs": "{filled} von {capacity} Arbeitsplätzen besetzt",
+  "statsNoise": "Mittlere Belastung {value}",
+  "statsCommute": "{km}, {car} mit dem Pkw",
+  "statsHeat": "Mittlere Überwärmung {value}",
+  "statsCo2": "{value}",
+  "statsHabitat": "Wirksames Habitat {area} ha, Vernetzung {conn}",
+  "statsBudgetDelta": "Letzter Monat {value}",
+
+  "aboutTitle": "Über Stadtbau",
+  "aboutText": "Stadtbau ist freie Software unter der GNU AGPL v3 oder später, mit einer Zusatzerlaubnis, die den Autoren App-Store-Builds erlaubt. Jeder Modellparameter nennt eine öffentliche Quelle; siehe docs/model im Repository.",
+  "aboutLicense": "Lizenz: AGPL-3.0-or-later",
+  "legendLow": "niedrig",
+  "legendHigh": "hoch"
+}

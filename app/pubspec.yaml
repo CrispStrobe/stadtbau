@@ -1,0 +1,27 @@
+name: stadtbau
+description: Stadtbau - a tile-placement simulation of urban habitat, ecology and economy.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  stadtbau_sim:
+    path: ../packages/stadtbau_sim
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  generate: true
