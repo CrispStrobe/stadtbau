@@ -343,8 +343,9 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   App Store exception referenced in the About screen.
 - [ ] **T-404 Windows and Linux desktop** builds; installer via MSIX (Windows) and
   AppImage/Flatpak (Linux).
-- [ ] **T-405 About / licenses screen.** Shows AGPL, the section 7 exception, third-party
+- [x] **T-405 About / licenses screen.** Shows AGPL, the section 7 exception, third-party
   licenses (`THIRD_PARTY.md`), data attributions, link to source repository.
+  *Note 2026-09-05:* `AboutScreen` like the sibling apps: header with version, provider, contact, privacy, disclaimer, license + section 7 exception, data sources, `showLicensePage` with the bundled AGPL/exception texts and data-source entries registered via `LicenseRegistry`. Widget tests in DE and EN.
 
 ### Phase 5 — Model depth
 

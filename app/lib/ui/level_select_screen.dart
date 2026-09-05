@@ -5,6 +5,7 @@ import 'package:stadtbau_sim/stadtbau_sim.dart';
 import '../game/game_controller.dart';
 import '../game/save_store.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'about_screen.dart';
 import 'game_screen.dart';
 
 /// Home screen: continue the autosave, play the sandbox or pick a level.
@@ -76,6 +77,11 @@ class _LevelSelectScreenState extends State<LevelSelectScreen> {
         title: Text(l10n.appTitle),
         actions: [
           IconButton(tooltip: l10n.actionLanguage, icon: const Icon(Icons.translate), onPressed: widget.onLocaleToggle),
+          IconButton(
+            tooltip: l10n.actionAbout,
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AboutScreen())),
+          ),
         ],
       ),
       body: Center(

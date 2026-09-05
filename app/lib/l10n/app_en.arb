@@ -121,9 +121,6 @@
   "statsBudgetDelta": "Last month {value}",
   "@statsBudgetDelta": {"placeholders": {"value": {"type": "String"}}},
 
-  "aboutTitle": "About Stadtbau",
-  "aboutText": "Stadtbau is free software under the GNU AGPL v3 or later, with an additional permission that lets the authors publish app-store builds. Every model parameter cites a public source; see docs/model in the repository.",
-  "aboutLicense": "License: AGPL-3.0-or-later",
   "legendLow": "low",
   "legendHigh": "high",
 
@@ -153,5 +150,24 @@
   "breakdownAir": "Pollution sources",
   "breakdownRow": "{tile} · {count} tiles, nearest {distance} m",
   "@breakdownRow": {"placeholders": {"tile": {"type": "String"}, "count": {"type": "int"}, "distance": {"type": "String"}}},
-  "breakdownNone": "No sources in range."
+  "breakdownNone": "No sources in range.",
+
+  "aboutTitle": "About Stadtbau",
+  "aboutTagline": "A simulation of how a city, its landscape and its economy shape each other.",
+  "aboutVersionLabel": "Version {version}",
+  "@aboutVersionLabel": {"placeholders": {"version": {"type": "String"}}},
+  "aboutProvider": "Provider",
+  "aboutContact": "Contact",
+  "aboutPrivacy": "Privacy",
+  "aboutPrivacyText": "Stadtbau runs entirely on your device. The only data it stores is your saved game and your best results, in local app storage. There are no accounts, no ads, no analytics and no network requests while you play.",
+  "aboutDisclaimer": "Disclaimer",
+  "aboutDisclaimerText": "Stadtbau is a game. Its model simplifies real planning science and uses published averages, not local measurements. It is provided as is, without warranty of any kind, and is not planning, legal or environmental advice.",
+  "aboutLicense": "License",
+  "aboutLicenseText": "Stadtbau is free software under the GNU Affero General Public License, version 3 or (at your option) any later version. You may use, study, share and modify it under that license; the complete source code is published in the repository linked above.",
+  "aboutExceptionText": "Additional permission under AGPL section 7: the copyright holders may distribute builds of Stadtbau through app stores under the stores' terms. The full text of this exception ships with the app and is listed under the open-source licenses.",
+  "aboutDataSources": "Model data sources",
+  "aboutDataSourcesText": "Every parameter of the simulation cites a public source: German and EU law, official statistics and open scientific models. Only values, formulas and law texts are used; no protected texts, artwork or data tables are copied. Ökolopoly, SimCity and similar games served as inspiration for ideas only.",
+  "aboutOpenSourceLicenses": "Open-source licenses",
+  "appLegalese": "© {year} Christian Ströbele · AGPL-3.0-or-later",
+  "@appLegalese": {"placeholders": {"year": {"type": "int"}}}
 }

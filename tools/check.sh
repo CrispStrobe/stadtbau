@@ -16,6 +16,10 @@ if ! git diff --quiet -- packages/stadtbau_sim/lib/src/generated/default_params.
   echo "note: generated params changed; commit packages/stadtbau_sim/lib/src/generated/default_params.dart"
 fi
 
+echo "== bundled license assets"
+cmp -s LICENSE app/assets/licenses/AGPL-3.0.txt || { echo "app/assets/licenses/AGPL-3.0.txt differs from LICENSE; copy it"; exit 1; }
+cmp -s LICENSE-EXCEPTION.md app/assets/licenses/APP-STORE-EXCEPTION.md || { echo "app/assets/licenses/APP-STORE-EXCEPTION.md differs from LICENSE-EXCEPTION.md; copy it"; exit 1; }
+
 echo "== l10n"
 (cd app && flutter gen-l10n)
 

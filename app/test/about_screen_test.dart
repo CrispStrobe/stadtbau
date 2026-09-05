@@ -1,0 +1,68 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:stadtbau/l10n/generated/app_localizations.dart';
+import 'package:stadtbau/ui/about_screen.dart';
+
+Widget _app(Locale locale) => MaterialApp(
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const AboutScreen(),
+    );
+
+void main() {
+  setUp(() {
+    PackageInfo.setMockInitialValues(
+      appName: 'Stadtbau',
+      packageName: 'de.stadtbau.stadtbau',
+      version: '0.1.0',
+      buildNumber: '1',
+      buildSignature: '',
+    );
+  });
+
+  for (final locale in const [Locale('en'), Locale('de')]) {
+    testWidgets('renders every section and the licenses button (${locale.languageCode})', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 2200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(_app(locale));
+      await tester.pumpAndSettle();
+
+      final l10n = await AppLocalizations.delegate.load(locale);
+      for (final label in [
+        l10n.aboutProvider,
+        l10n.aboutContact,
+        l10n.aboutPrivacy,
+        l10n.aboutDisclaimer,
+        l10n.aboutLicense,
+        l10n.aboutDataSources,
+        l10n.aboutOpenSourceLicenses,
+      ]) {
+        expect(find.text(label), findsOneWidget, reason: label);
+      }
+      expect(find.text(AboutScreen.email), findsOneWidget);
+      expect(find.text(AboutScreen.phone), findsOneWidget);
+      expect(find.textContaining('Bundeskompensationsverordnung'), findsOneWidget);
+      expect(find.text(l10n.aboutVersionLabel('0.1.0+1')), findsOneWidget);
+    });
+  }
+
+  testWidgets('the licenses page opens and lists the app license', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(900, 2200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(_app(const Locale('en')));
+    await tester.pumpAndSettle();
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await tester.tap(find.text(l10n.aboutOpenSourceLicenses));
+    await tester.pumpAndSettle();
+    expect(find.byType(LicensePage), findsOneWidget);
+  });
+}

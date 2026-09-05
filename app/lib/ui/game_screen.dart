@@ -5,6 +5,7 @@ import 'package:stadtbau_sim/stadtbau_sim.dart';
 
 import '../game/game_controller.dart';
 import '../l10n/generated/app_localizations.dart';
+import 'about_screen.dart';
 import 'goals_panel.dart';
 import 'indicator_panel.dart';
 import 'map_view.dart';
@@ -127,19 +128,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _about() {
-    final l10n = AppLocalizations.of(context);
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.aboutTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text(l10n.aboutText), const SizedBox(height: 8), Text(l10n.aboutLicense)],
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.ok))],
-      ),
-    );
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AboutScreen()));
   }
 
   @override
