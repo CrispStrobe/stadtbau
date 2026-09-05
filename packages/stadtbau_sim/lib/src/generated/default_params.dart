@@ -33,17 +33,17 @@ const String defaultParamsJson = r'''
         "source": "Copernicus Imperviousness: grassland ~0 %"
       },
       "biotopeValue": {
-        "value": 13,
-        "source": "BKompV Anlage 2, mesophiles Grünland (verify code, T-103)",
-        "note": "initial estimate"
+        "value": 18,
+        "source": "BKompV Anlage 2: 34.07a.02 artenreiche frische (Mäh-)Weide = 18 (34.07a.01 Mähwiese = 20, 34.08a.01 Intensivgrünland = 8); modelled as extensive grassland developing from intensive to species-rich"
       },
       "biotopeStart": {
-        "value": 0.6,
-        "source": "design: sown meadow reaches full value after recoveryMonths"
+        "value": 0.45,
+        "source": "BKompV Anlage 2: starts as Intensivgrünland (8/18)"
       },
       "recoveryMonths": {
-        "value": 60,
-        "source": "BfN: Extensivgrünland Entwicklungszeit 5–10 Jahre (initial estimate)"
+        "value": 120,
+        "source": "BfN-Schriften 721 / Kompensationspraxis: Entwicklung artenreichen Grünlands 10–15 Jahre",
+        "note": "initial estimate"
       },
       "noiseEmissionDb": {
         "value": 0,
@@ -102,8 +102,7 @@ const String defaultParamsJson = r'''
       },
       "biotopeValue": {
         "value": 6,
-        "source": "BKompV Anlage 2, intensiv genutzter Acker (verify code, T-103)",
-        "note": "initial estimate"
+        "source": "BKompV Anlage 2: 33.0x.03 Acker mit stark verarmter oder fehlender Segetalvegetation = 6"
       },
       "biotopeStart": {
         "value": 1.0,
@@ -169,17 +168,18 @@ const String defaultParamsJson = r'''
         "source": "Copernicus Imperviousness"
       },
       "biotopeValue": {
-        "value": 17,
-        "source": "BKompV Anlage 2, Laubwald mittleren Alters (verify code, T-103)",
-        "note": "initial estimate"
+        "value": 18,
+        "source": "BKompV Anlage 2: 43.07.05M Buchen(misch)wald frischer basenreicher Standorte, mittlere Ausprägung = 16; 43.07.02M Eichen-Hainbuchenwald mittlere Ausprägung = 20; mean 18"
       },
       "biotopeStart": {
-        "value": 0.3,
-        "source": "design: young plantation ~ Vorwald value"
+        "value": 0.4,
+        "source": "BKompV Anlage 2: young plantation below Vorwald (42.03.02 Vorwald frischer Standorte = 13); 0.4·18 ≈ 7",
+        "note": "initial estimate"
       },
       "recoveryMonths": {
         "value": 240,
-        "source": "BKompV/BfN: Waldentwicklung 20+ Jahre bis mittleres Alter (initial estimate)"
+        "source": "BKompV Anlage 2 distinguishes junge / mittlere / alte Ausprägung; mittlere Ausprägung after ~20–40 years",
+        "note": "initial estimate"
       },
       "noiseEmissionDb": {
         "value": 0,
@@ -238,7 +238,7 @@ const String defaultParamsJson = r'''
       },
       "biotopeValue": {
         "value": 16,
-        "source": "BKompV Anlage 2, naturnahes Stillgewässer (verify code, T-103)",
+        "source": "BKompV Anlage 2: 24.03b sonstige natürliche mesotrophe Gewässer = 19; constructed pond assumed below natural, 16",
         "note": "initial estimate"
       },
       "biotopeStart": {
@@ -305,17 +305,18 @@ const String defaultParamsJson = r'''
         "source": "paths and playgrounds (initial estimate)"
       },
       "biotopeValue": {
-        "value": 9,
-        "source": "BKompV Anlage 2, Parkanlage mit Baumbestand (verify code, T-103)",
-        "note": "initial estimate"
+        "value": 13,
+        "source": "BKompV Anlage 2: 51.06a.03 intensiv gepflegte Parkanlage mit altem Baumbestand = 13 (51.06a.02.01 extensiv gepflegt = 16)"
       },
       "biotopeStart": {
         "value": 0.5,
-        "source": "design"
+        "source": "BKompV Anlage 2: park without old trees; grows into 13 as trees age",
+        "note": "initial estimate"
       },
       "recoveryMonths": {
-        "value": 120,
-        "source": "initial estimate"
+        "value": 240,
+        "source": "tree maturity 20–40 years",
+        "note": "initial estimate"
       },
       "noiseEmissionDb": {
         "value": 0,
@@ -362,7 +363,7 @@ const String defaultParamsJson = r'''
       "category": "residential",
       "residentsPerHa": {
         "value": 45,
-        "source": "BBSR städtebauliche Dichte: Einfamilienhausgebiet 30–60 EW/ha; Destatis 47.4 m² Wohnfläche/EW"
+        "source": "Derived: GFZ 0.4 (typical EFH-Gebiet, BauNVO §17 allows up to 1.2 in WA) × 10 000 m² × 0.8 net = 3 200 m² Wohnfläche ÷ 49.2 m²/EW (Destatis, Ende 2024) = 65 EW/ha net; × 0.7 gross incl. streets ≈ 45"
       },
       "jobsPerHa": {
         "value": 3,
@@ -374,8 +375,7 @@ const String defaultParamsJson = r'''
       },
       "biotopeValue": {
         "value": 5,
-        "source": "BKompV Anlage 2, locker bebaute Siedlung mit Gärten (verify code, T-103)",
-        "note": "initial estimate"
+        "source": "BKompV Anlage 2: 53.01.03b lockeres Einzelhausgebiet = 5"
       },
       "biotopeStart": {
         "value": 1.0,
@@ -398,16 +398,18 @@ const String defaultParamsJson = r'''
         "source": "gardens (initial estimate)"
       },
       "shade": {
-        "value": 0.25,
-        "source": "InVEST Urban Cooling: garden trees"
+        "value": 0.15,
+        "source": "InVEST Urban Cooling: shade = canopy fraction; garden trees over ~15 % of an EFH plot",
+        "note": "initial estimate"
       },
       "albedo": {
         "value": 0.2,
         "source": "InVEST Urban Cooling"
       },
       "eti": {
-        "value": 0.4,
-        "source": "InVEST Urban Cooling"
+        "value": 0.3,
+        "source": "InVEST Urban Cooling: lawns and gardens ~40 % of plot, Kc ~0.7",
+        "note": "initial estimate"
       },
       "greenWeight": {
         "value": 0.0,
@@ -430,7 +432,7 @@ const String defaultParamsJson = r'''
       "category": "residential",
       "residentsPerHa": {
         "value": 180,
-        "source": "BBSR: Geschosswohnungsbau GFZ 1.2 → 150–250 EW/ha; Destatis 47.4 m² Wohnfläche/EW"
+        "source": "Derived: GFZ 1.2 (BauNVO §17 Obergrenze WA/MI) × 10 000 m² × 0.8 net = 9 600 m² ÷ 49.2 m²/EW (Destatis, Ende 2024) = 195 EW/ha net; ~180 gross"
       },
       "jobsPerHa": {
         "value": 15,
@@ -441,9 +443,8 @@ const String defaultParamsJson = r'''
         "source": "BauNVO WA/MI GRZ 0.6 plus roads (initial estimate)"
       },
       "biotopeValue": {
-        "value": 2,
-        "source": "BKompV Anlage 2, dicht bebautes Siedlungsgebiet (verify code, T-103)",
-        "note": "initial estimate"
+        "value": 4,
+        "source": "BKompV Anlage 2: 53.01.16a.02 sonstige Blockbebauung = 4"
       },
       "biotopeStart": {
         "value": 1.0,
@@ -514,8 +515,7 @@ const String defaultParamsJson = r'''
       },
       "biotopeValue": {
         "value": 2,
-        "source": "BKompV Anlage 2, Gewerbegebiet (verify code, T-103)",
-        "note": "initial estimate"
+        "source": "BKompV Anlage 2: 53.01.14a Industrie- und Gewerbefläche inkl. typischen Freiräumen = 2"
       },
       "biotopeStart": {
         "value": 1.0,
@@ -581,9 +581,8 @@ const String defaultParamsJson = r'''
         "source": "BauNVO GI GRZ 0.8 plus yards (initial estimate)"
       },
       "biotopeValue": {
-        "value": 1,
-        "source": "BKompV Anlage 2, Industriegebiet, weitgehend versiegelt (verify code, T-103)",
-        "note": "initial estimate"
+        "value": 2,
+        "source": "BKompV Anlage 2: 53.01.14a Industrie- und Gewerbefläche inkl. typischen Freiräumen = 2"
       },
       "biotopeStart": {
         "value": 1.0,
@@ -650,7 +649,7 @@ const String defaultParamsJson = r'''
       },
       "biotopeValue": {
         "value": 0,
-        "source": "BKompV Anlage 2, versiegelte Verkehrsfläche = 0"
+        "source": "BKompV Anlage 2: 52.01.01a versiegelter Verkehrs- und Betriebsweg = 0"
       },
       "biotopeStart": {
         "value": 1.0,
@@ -763,8 +762,8 @@ const String defaultParamsJson = r'''
       "source": "Nowak et al.: local deposition effect within ~300 m (initial estimate)"
     },
     "indexScale": {
-      "value": 2.5,
-      "source": "calibration: index = 100·exp(−C/scale), T-114"
+      "value": 1.0,
+      "source": "calibration T-114: uniform housing_high + traffic (C≈0.4) → index ≈ 67; inside an industrial area (C≈3) → index ≈ 5"
     },
     "trafficReferenceVehiclesPerDay": {
       "value": 10000,
@@ -786,15 +785,16 @@ const String defaultParamsJson = r'''
     },
     "uhiMaxC": {
       "value": 3.0,
-      "source": "InVEST Urban Cooling: UHI magnitude user input; German mid-size cities 2–4 K (DWD) (initial estimate)"
+      "source": "InVEST Urban Cooling: UHI_max is a user input (rural–urban maximum difference); DWD reports 2–4 K for German mid-size cities",
+      "note": "initial estimate"
     },
     "greenPatchMinHa": {
       "value": 2,
-      "source": "InVEST Urban Cooling: green area ≥ 2 ha cools surroundings"
+      "source": "InVEST Urban Cooling: green areas larger than 2 ha have an additional cooling effect"
     },
     "coolingDistanceTiles": {
-      "value": 2,
-      "source": "InVEST Urban Cooling default d_cool 100 m; game uses 2 tiles for visibility (initial estimate)"
+      "value": 3,
+      "source": "InVEST Urban Cooling default d_cool = 450 m; game uses 3 tiles (300 m)"
     }
   },
   "access": {
@@ -907,19 +907,19 @@ const String defaultParamsJson = r'''
       "source": "Destatis: Erwerbstätige / Bevölkerung ≈ 0.52 (2023)"
     },
     "modeShareByDistance": {
-      "source": "MiD 2017 (BMVI), Wegelängenklassen; rounded",
+      "source": "MiD 2017 Ergebnisbericht (BMVI/infas) and MiD 2017 Analysen zum Rad- und Fußverkehr: walking dominates below 1 km but car already notable; cycling peaks at 1–1.5 km (21 %); car dominant from 1.5 km; commuting overall ≈ two thirds car, 21 % bike, 14 % walk",
       "bins": [
         {
           "maxKm": 1,
-          "walk": 0.6,
+          "walk": 0.55,
           "bike": 0.2,
-          "car": 0.2
+          "car": 0.25
         },
         {
           "maxKm": 3,
-          "walk": 0.2,
+          "walk": 0.15,
           "bike": 0.35,
-          "car": 0.45
+          "car": 0.5
         },
         {
           "maxKm": 1000,
@@ -952,16 +952,16 @@ const String defaultParamsJson = r'''
   },
   "economy": {
     "incomeTaxPerResidentYear": {
-      "value": 600,
-      "source": "Destatis kommunale Finanzen: Gemeindeanteil Einkommensteuer ≈ 50 Mrd € / 84 Mio EW (2023)"
+      "value": 550,
+      "source": "Destatis PM 126/2025: Gemeindeanteil Einkommensteuer 46.1 Mrd € (2024) ÷ 83.6 Mio EW ≈ 550 €"
     },
     "propertyTaxPerResidentYear": {
       "value": 180,
-      "source": "Destatis: Grundsteuer ≈ 15 Mrd € / 84 Mio EW (2023)"
+      "source": "Destatis PM N006/2025: Grundsteuer B 15.1 Mrd € (2023) ÷ 84 Mio EW ≈ 180 €"
     },
     "businessTaxPerJobYear": {
       "value": 2100,
-      "source": "Destatis: Gewerbesteuer netto ≈ 75 Mrd € / 35 Mio SV-Beschäftigte (2023)"
+      "source": "Destatis PM 356/2024: Gewerbesteuer 75.1 Mrd € (2023) ÷ ~35 Mio SV-Beschäftigte ≈ 2 100 €"
     },
     "startBudgetKEur": {
       "value": 25000,

@@ -173,8 +173,11 @@ IndicatorSnapshot computeIndicators(
 
   final commuting = hasResidents ? 100 * (0.5 * (1 - clamp01(commuteKm / 10)) + 0.5 * (1 - carShare)) : 0.0;
 
-  final co2PerHa = co2TonsPerYear / n;
-  final co2Score = clamp01((5 - co2PerHa) / 15);
+  // CO₂ per person (residents + jobs), floored at a tenth of the cell count
+  // so that empty maps are judged by their absolute balance. 2.5 t/person/a
+  // scores zero; a net sink scores one.
+  final people = math.max(population + f.jobsCapacity, n / 10);
+  final co2Score = clamp01(1 - (co2TonsPerYear / people) / 2.5);
   final climate = 100 * (0.7 * co2Score + 0.3 * (1 - clamp01(heat / p.heat.uhiMaxC)));
 
   final scores = <Indicator, double>{

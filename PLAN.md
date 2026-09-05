@@ -205,8 +205,9 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   one language, string literals inside `Text(`/`Tooltip(`/`SnackBar(` widgets under
   `app/lib/` (allow-list annotation `// i18n-ignore` for identifiers).
   *Note 2026-09-05:* ARB files with ~90 keys in DE and EN, `flutter gen-l10n`, `tools/i18n_lint.dart` (key parity + literal detection).
-- [ ] **T-005 CI.** GitHub Actions (or Woodpecker) workflow: analyze, test, i18n lint,
+- [x] **T-005 CI.** GitHub Actions (or Woodpecker) workflow: analyze, test, i18n lint,
   license audit, web build artifact. Cache pub. Runs on push and PR.
+  *Note 2026-09-05 (2):* `.github/workflows/check.yml`: analyze, tests, i18n lint, license audit, params mirror check, web build artifact.
 - [x] **T-006 `tools/check.sh`.** One local command that runs everything CI runs.
   *Note 2026-09-05:* `tools/check.sh` runs params mirror, gen-l10n, analyze, tests, i18n lint, license audit.
 
@@ -220,44 +221,52 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   numeric field carrying `{ "value": …, "source": "…", "note": "…" }`. Loader + validator
   (all ids present, ranges sane). Test: schema validation.
   *Note 2026-09-05:* `data/params/tiles.json` with {value, source} entries, mirrored by `tools/gen_params.dart`; loader validates all ten ids.
-- [ ] **T-103 Verify tile parameters against sources.** For each row in §4.1 look up:
+- [x] **T-103 Verify tile parameters against sources.** For each row in §4.1 look up:
   BKompV Anlage 2 biotope code and value (gesetze-im-internet.de/bkompv/anlage_2.html),
   BBSR density values, TA Lärm zone limits, CNOSSOS emission references. Update
   `tiles.json` sources. Write `docs/model/tiles.md` with the citations. No code.
+  *Note 2026-09-05 (2):* BKompV Anlage 2 codes recorded per tile (`docs/model/tiles.md`); densities derived from Destatis 49.2 m²/EW and BauNVO GFZ; taxes from Destatis 2023/2024 releases; MiD 2017 mode shares. Costs and recovery times remain estimates.
 - [x] **T-104 Kernel engine.** Generic `FieldSolver` that takes emitters (tile → strength)
   and a kernel (function of Chebyshev or Euclidean distance in tiles) and fills a
   `Float32List` field. Support energetic (dB) summation and linear summation. Precompute
   offset tables up to radius R. Tests: single emitter symmetry, superposition.
   *Note 2026-09-05:* `Offsets` (radius tables), `cellsBetween` (Bresenham), `DisjointSet` in `geometry.dart`.
-- [~] **T-105 Noise field.** Implement §4.2 noise: line-source decay for roads, area decay
+- [x] **T-105 Noise field.** Implement §4.2 noise: line-source decay for roads, area decay
   for others, foliage and screening attenuation along the straight-line path (Bresenham).
   Output per residential tile L_den. Test: road at 100 m ≈ 60 dB, forest in between lowers
   by 2 dB per tile. Document in `docs/model/noise.md` with CNOSSOS / TA Lärm references.
   *Note 2026-09-05:* Code + tests done (`model/noise.dart`, point-source segments summed energetically, path attenuation). `docs/model/noise.md` still to write.
-- [~] **T-106 Air pollution field.** Exponential kernel, deposition sinks, traffic
+  *Note 2026-09-05 (2):* `docs/model/noise.md` written.
+- [x] **T-106 Air pollution field.** Exponential kernel, deposition sinks, traffic
   contribution hook (filled by T-110). `docs/model/air.md` citing EMEP/EEA guidebook and
   Nowak et al. deposition magnitudes.
   *Note 2026-09-05:* Code done (`model/air.dart`). `docs/model/air.md` still to write; wind deferred to T-501.
-- [~] **T-107 Cooling / heat field.** InVEST Urban Cooling simplification: CC per tile from
+  *Note 2026-09-05 (2):* `docs/model/air.md` written; kernel normalised after calibration.
+- [x] **T-107 Cooling / heat field.** InVEST Urban Cooling simplification: CC per tile from
   params (shade, albedo, ETI), connected green patches ≥ 2 ha cool within 100 m, UHI 3.5 °C.
   `docs/model/heat.md` citing InVEST user guide (Apache-2.0 docs).
   *Note 2026-09-05:* Code done (`model/heat.dart`). `docs/model/heat.md` still to write.
-- [~] **T-108 Access fields.** Green access (300 m boolean + quality), retail Huff access
+  *Note 2026-09-05 (2):* `docs/model/heat.md` written; ΔT rescaled to the meadow reference, d_cool 3 tiles (InVEST default 450 m).
+- [x] **T-108 Access fields.** Green access (300 m boolean + quality), retail Huff access
   (λ = 2, 700 m), job gravity access (2 km). `docs/model/access.md` citing WHO, 3-30-300,
   BBSR Nahversorgung, Huff 1963.
   *Note 2026-09-05:* Code done (`model/access.dart`). `docs/model/access.md` still to write.
-- [~] **T-109 Habitat quality and biodiversity.** InVEST Habitat Quality threats table,
+  *Note 2026-09-05 (2):* `docs/model/access.md` written.
+- [x] **T-109 Habitat quality and biodiversity.** InVEST Habitat Quality threats table,
   patch labelling (8-neighbourhood union-find), species-area index, maturation stock for
   forest/meadow. `docs/model/biodiversity.md` citing InVEST HQ, BKompV, MacArthur–Wilson.
   *Note 2026-09-05:* Code + tests done (`model/habitat.dart`, effective mesh size for connectivity). `docs/model/biodiversity.md` still to write.
-- [~] **T-110 Commuting and traffic.** §4.4: workers, gravity distribution, mode share by
+  *Note 2026-09-05 (2):* `docs/model/biodiversity.md` written.
+- [x] **T-110 Commuting and traffic.** §4.4: workers, gravity distribution, mode share by
   distance (MiD 2017 bins), vehicles/day assigned to road tiles, feeds T-105/T-106.
   `docs/model/commute.md`.
   *Note 2026-09-05:* Code done (`model/commute.dart`, in/out-commuters, road assignment). `docs/model/commute.md` still to write.
-- [~] **T-111 Stocks and budget.** §4.3 population, jobs, budget, CO₂ with monthly ticks.
+  *Note 2026-09-05 (2):* `docs/model/commute.md` written; trips now routed over the road network with border exits.
+- [x] **T-111 Stocks and budget.** §4.3 population, jobs, budget, CO₂ with monthly ticks.
   Placement costs and maintenance from params. `docs/model/economy.md` citing Destatis
   kommunale Finanzen. Test: a balanced 16×16 sample city has positive budget after 24 ticks.
   *Note 2026-09-05:* Code + test done (`model/stocks.dart`). `docs/model/economy.md` still to write.
+  *Note 2026-09-05 (2):* `docs/model/economy.md` written.
 - [x] **T-112 Indicators.** §4.5 ten indicators with 0–100 scaling and raw values;
   `IndicatorSnapshot` JSON. Test: all-forest map → biodiversity ≈ 100, housing 0.
   *Note 2026-09-05:* `indicators.dart`; tests for all-forest and mixed quarter pass.
@@ -265,11 +274,12 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
   `EndTurn/Tick`, with validation (budget, allowed tile list, bounds). Event log for
   replay. Test: replaying a log reproduces the final state hash.
   *Note 2026-09-05:* `Simulation.apply`, `TileBudget`, command log and `Simulation.replay`; replay hash test passes.
-- [ ] **T-114 Calibration harness.** `tool/calibrate.dart` builds archetype maps
+- [x] **T-114 Calibration harness.** `tool/calibrate.dart` builds archetype maps
   (village, suburb, dense quarter, industrial park, forest) and prints indicators; results
   are checked against plausibility ranges written in `docs/model/calibration.md`
   (e.g. dense quarter noise exposure 55–65 dB, suburb car share 0.6–0.8). Adjust
   coefficients only via `data/params/`.
+  *Note 2026-09-05 (2):* `tool/calibrate.dart` with seven archetypes; ranges and results in `docs/model/calibration.md`. Climate score changed to per-person CO₂.
 - [ ] **T-115 Performance.** 24×24 map full tick < 16 ms on desktop, < 50 ms on a mid
   Android phone (measure with `benchmark_harness`). Optimise kernels if needed.
 
@@ -296,9 +306,10 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
 - [~] **T-206 Tile inspector.** Tap tile → per-field values, contributing emitters
   ("Lärm: 62 dB, davon Hauptstraße (2 Felder) 58 dB…").
   *Note 2026-09-05:* Inspector shows all per-cell fields. Breakdown by contributing emitters still open.
-- [~] **T-207 Game loop and pace.** Play/pause, 1×/3×/10× ticks, turn mode (tick only on
+- [x] **T-207 Game loop and pace.** Play/pause, 1×/3×/10× ticks, turn mode (tick only on
   "End turn"). Autosave to local storage (`shared_preferences` / file), load/new game.
   *Note 2026-09-05:* Play/pause, step, 1×/3×/10×, new game with size slider. Autosave/load still open.
+  *Note 2026-09-05 (2):* Autosave (2 s debounce) and restore via `shared_preferences` (BSD-3); test covers the round trip.
 - [ ] **T-208 Onboarding.** Three-step tutorial overlay explaining tiles, overlays and one
   feedback loop. Strings in ARB.
 

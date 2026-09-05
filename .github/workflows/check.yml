@@ -1,0 +1,58 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.1
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: Params mirror is current
+        run: |
+          dart run tools/gen_params.dart
+          git diff --exit-code -- packages/stadtbau_sim/lib/src/generated/default_params.dart
+
+      - name: Localizations
+        run: cd app && flutter gen-l10n
+
+      - name: Analyze
+        run: |
+          (cd packages/stadtbau_sim && dart analyze --fatal-infos)
+          (cd app && flutter analyze --fatal-infos)
+
+      - name: Test simulation
+        run: cd packages/stadtbau_sim && dart test
+
+      - name: Test app
+        run: cd app && flutter test
+
+      - name: i18n lint
+        run: dart run tools/i18n_lint.dart
+
+      - name: License audit
+        run: |
+          tools/license_audit.sh
+          git diff --exit-code -- THIRD_PARTY.md || echo "THIRD_PARTY.md changed; commit it"
+
+      - name: Build web
+        run: cd app && flutter build web --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: app/build/web
+          retention-days: 14

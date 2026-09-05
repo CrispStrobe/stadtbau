@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'game/game_controller.dart';
+import 'game/save_store.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'ui/game_screen.dart';
 
@@ -18,8 +19,14 @@ class StadtbauApp extends StatefulWidget {
 }
 
 class _StadtbauAppState extends State<StadtbauApp> {
-  late final GameController _controller = GameController();
+  late final GameController _controller = GameController(store: SaveStore());
   Locale? _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.restore();
+  }
 
   void _toggleLocale() {
     setState(() {

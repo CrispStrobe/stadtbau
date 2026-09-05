@@ -4,12 +4,19 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:stadtbau_sim/stadtbau_sim.dart';
 
+import 'save_store.dart';
+
 /// Colour overlays the player can toggle on the map.
 enum MapOverlay { none, noise, air, heat, green, retail, jobs, habitat, traffic, attractiveness }
 
 /// UI-facing state around the simulation: brush, overlay, selection, clock.
 class GameController extends ChangeNotifier {
-  GameController({int size = 16}) : sim = Simulation.sandbox(width: size, height: size);
+  GameController({int size = 16, SaveStore? store})
+      : sim = Simulation.sandbox(width: size, height: size),
+        _store = store; // ignore: prefer_initializing_formals
+
+  final SaveStore? _store;
+  Timer? _saveTimer;
 
   Simulation sim;
   TileType? brush;
@@ -27,8 +34,28 @@ class GameController extends ChangeNotifier {
   int get width => sim.state.width;
   int get height => sim.state.height;
 
+  /// Restore the autosave, if any. Call once after construction.
+  Future<void> restore() async {
+    final saved = await _store?.load();
+    if (saved == null) return;
+    _stopTimer();
+    sim = Simulation(state: saved);
+    speed = 0;
+    selectedCell = null;
+    notifyListeners();
+  }
+
+  void _scheduleSave() {
+    final store = _store;
+    if (store == null) return;
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(seconds: 2), () => store.save(sim));
+  }
+
   void newGame(int size) {
     _stopTimer();
+    _saveTimer?.cancel();
+    _store?.clear();
     sim = Simulation.sandbox(width: size, height: size);
     brush = null;
     selectedCell = null;
@@ -63,6 +90,7 @@ class GameController extends ChangeNotifier {
     final result = sim.apply(PlaceTile(x, y, t));
     lastError = result.error;
     selectedCell = sim.state.index(x, y);
+    if (result.ok) _scheduleSave();
     notifyListeners();
     return result.ok;
   }
@@ -70,12 +98,14 @@ class GameController extends ChangeNotifier {
   bool clear(int x, int y) {
     final result = sim.apply(RemoveTile(x, y));
     lastError = result.error;
+    if (result.ok) _scheduleSave();
     notifyListeners();
     return result.ok;
   }
 
   void step() {
     sim.apply(const AdvanceTick());
+    _scheduleSave();
     notifyListeners();
   }
 
@@ -132,6 +162,7 @@ class GameController extends ChangeNotifier {
   @override
   void dispose() {
     _stopTimer();
+    _saveTimer?.cancel();
     super.dispose();
   }
 }

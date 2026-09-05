@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import '../fields.dart';
 import '../geometry.dart';
 import '../params.dart';
+import '../tile_type.dart';
 import '../world.dart';
 
 /// Urban heat (docs/model/heat.md), after the InVEST Urban Cooling model.
@@ -12,17 +13,30 @@ import '../world.dart';
 /// Cooling capacity CC = 0.6·shade + 0.2·albedo + 0.2·ETI per land cover.
 /// Green patches of at least 2 ha cool cells within the cooling distance;
 /// the heat mitigation index is max(own CC, distance-weighted green CC).
-/// Temperature excess ΔT = UHI_max · (1 − HM).
+/// InVEST writes T = T_rural + UHI_max · (1 − HM); because the rural
+/// reference itself has HM ≈ 0.2–0.3, the game rescales so that the base
+/// terrain (meadow) sits at ΔT = 0 and the least cooling land cover at
+/// ΔT = UHI_max: ΔT = UHI_max · clamp((CC_ref − HM) / (CC_ref − CC_min)).
 void computeHeat(WorldState w, SimParams p, Fields f) {
   final n = w.cellCount;
   final width = w.width;
   final hp = p.heat;
 
+  double capacity(TileParams tp) =>
+      hp.shadeWeight * tp.shade.value + hp.albedoWeight * tp.albedo.value + hp.etiWeight * tp.eti.value;
+
+  final ccRef = capacity(p.tile(TileType.terrain));
+  var ccMin = ccRef;
+  for (final t in TileType.values) {
+    ccMin = math.min(ccMin, capacity(p.tile(t)));
+  }
+  final span = math.max(1e-6, ccRef - ccMin);
+
   final cc = f.coolingCapacity;
   final isGreen = Uint8List(n);
   for (var i = 0; i < n; i++) {
     final tp = p.tile(w.tiles[i]);
-    cc[i] = hp.shadeWeight * tp.shade.value + hp.albedoWeight * tp.albedo.value + hp.etiWeight * tp.eti.value;
+    cc[i] = capacity(tp);
     isGreen[i] = tp.category.isGreen ? 1 : 0;
   }
 
@@ -63,6 +77,6 @@ void computeHeat(WorldState w, SimParams p, Fields f) {
       final weight = 1 - offsets.dist[k] / (hp.coolingDistanceTiles + 1);
       hm = math.max(hm, cc[j] * weight);
     }
-    f.heatDeltaC[i] = hp.uhiMaxC * (1 - clamp01(hm));
+    f.heatDeltaC[i] = hp.uhiMaxC * clamp01((ccRef - hm) / span);
   }
 }
