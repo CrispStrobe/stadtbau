@@ -88,4 +88,81 @@ void computeNoise(WorldState w, SimParams p, Fields f) {
   }
 }
 
+/// One row of a per-cell breakdown: how much a tile type contributes.
+class Contribution {
+  const Contribution({required this.type, required this.count, required this.nearestTiles, required this.value});
+
+  final TileType type;
+
+  /// Number of source tiles of this type that reach the cell.
+  final int count;
+
+  /// Distance in tiles to the nearest of them.
+  final double nearestTiles;
+
+  /// Contribution in the field's unit (dB for noise, concentration for air).
+  final double value;
+}
+
+/// Noise at [cell] broken down by source tile type (energetic sums), sorted
+/// by level, for the tile inspector. Uses the same formulas as [computeNoise].
+List<Contribution> explainNoise(WorldState w, SimParams p, Fields f, int cell) {
+  final width = w.width;
+  final np = p.noise;
+  final offsets = Offsets.radius(np.radiusTiles);
+  final rx = cell % width;
+  final ry = cell ~/ width;
+  final energy = <TileType, double>{};
+  final count = <TileType, int>{};
+  final nearest = <TileType, double>{};
+
+  void add(TileType t, double level, double dist) {
+    energy[t] = (energy[t] ?? 0) + math.pow(10, level / 10).toDouble();
+    count[t] = (count[t] ?? 0) + 1;
+    nearest[t] = math.min(nearest[t] ?? double.infinity, dist);
+  }
+
+  double emissionOf(int i) {
+    final t = w.tiles[i];
+    final base = p.tile(t).noiseEmissionDb.value;
+    if (base <= 0) return 0;
+    if (t == TileType.road) return base + 10 * _log10(math.max(f.traffic[i], 1.0) / np.trafficReferenceVehiclesPerDay);
+    return base;
+  }
+
+  final own = emissionOf(cell);
+  if (own > 0) add(w.tiles[cell], own, 0);
+  for (var k = 0; k < offsets.length; k++) {
+    // Source at the mirrored offset so that the path runs source → receiver.
+    final sx = rx - offsets.dx[k];
+    final sy = ry - offsets.dy[k];
+    if (!w.inBounds(sx, sy)) continue;
+    final s = sy * width + sx;
+    final e = emissionOf(s);
+    if (e <= 0) continue;
+    final dM = offsets.dist[k] * p.cellSizeM;
+    var level = e -
+        np.areaDecayDbPerDecade * _log10(math.max(dM, np.areaReferenceDistanceM) / np.areaReferenceDistanceM);
+    var att = 0.0;
+    final path = offsets.pathOffsets[k];
+    for (var i = 0; i < path.length; i += 2) {
+      final c = (sy + path[i + 1]) * width + sx + path[i];
+      final t = w.tiles[c];
+      if (t == TileType.forest || t == TileType.park) {
+        att += np.foliageAttenuationDbPerTile;
+      } else if (p.tile(t).category == TileCategory.work || t == TileType.housingHigh) {
+        att += np.buildingScreeningDbPerTile;
+      }
+    }
+    level -= math.min(att, np.maxPathAttenuationDb);
+    if (level <= np.backgroundDb - 15) continue;
+    add(w.tiles[s], level, offsets.dist[k]);
+  }
+  final rows = [
+    for (final t in energy.keys)
+      Contribution(type: t, count: count[t]!, nearestTiles: nearest[t]!, value: 10 * _log10(energy[t]!)),
+  ]..sort((a, b) => b.value.compareTo(a.value));
+  return rows;
+}
+
 double _log10(double v) => math.log(v) / math.ln10;

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:stadtbau_sim/stadtbau_sim.dart';
 import 'package:test/test.dart';
@@ -79,6 +80,29 @@ void main() {
       sim.apply(const PlaceTile(6, 5, TileType.housingLow));
       final level = sim.fields.noiseDb[sim.state.index(6, 5)];
       expect(level, greaterThan(params.noise.limitDayDb));
+    });
+  });
+
+  group('explain', () {
+    test('noise and air breakdowns are consistent with the fields', () {
+      final sim = Simulation.sandbox();
+      for (var y = 0; y < 16; y++) {
+        sim.apply(PlaceTile(4, y, TileType.road));
+      }
+      sim.apply(const PlaceTile(8, 8, TileType.industry));
+      final noise = sim.explainNoise(6, 8);
+      expect(noise.first.type, anyOf(TileType.road, TileType.industry));
+      var energy = math.pow(10, params.noise.backgroundDb / 10).toDouble();
+      for (final c in noise) {
+        energy += math.pow(10, c.value / 10);
+      }
+      expect(10 * math.log(energy) / math.ln10, closeTo(sim.fields.noiseDb[sim.state.index(6, 8)], 0.01));
+      final air = sim.explainAir(6, 8);
+      var sum = 0.0;
+      for (final c in air) {
+        sum += c.value;
+      }
+      expect(sum, closeTo(sim.fields.airConcentration[sim.state.index(6, 8)], 1e-9));
     });
   });
 

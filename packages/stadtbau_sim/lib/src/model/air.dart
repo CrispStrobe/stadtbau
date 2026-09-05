@@ -7,6 +7,7 @@ import '../geometry.dart';
 import '../params.dart';
 import '../tile_type.dart';
 import '../world.dart';
+import 'noise.dart' show Contribution;
 
 /// Air pollution (docs/model/air.md).
 ///
@@ -72,4 +73,58 @@ void computeAir(WorldState w, SimParams p, Fields f) {
     conc[i] *= factor;
     f.airIndex[i] = 100 * math.exp(-conc[i] / ap.indexScale);
   }
+}
+
+/// Air concentration at [cell] broken down by source tile type, after the
+/// local deposition factor, sorted by contribution.
+List<Contribution> explainAir(WorldState w, SimParams p, Fields f, int cell) {
+  final width = w.width;
+  final ap = p.air;
+  final offsets = Offsets.radius(ap.radiusTiles);
+  var kernelSum = 1.0;
+  for (var k = 0; k < offsets.length; k++) {
+    kernelSum += math.exp(-offsets.dist[k] * p.cellSizeM / ap.decayLengthM);
+  }
+  final total = <TileType, double>{};
+  final count = <TileType, int>{};
+  final nearest = <TileType, double>{};
+
+  double emissionOf(int i) {
+    final t = w.tiles[i];
+    var e = p.tile(t).airEmission.value;
+    if (e <= 0) return 0;
+    if (t == TileType.road) e *= f.traffic[i] / ap.trafficReferenceVehiclesPerDay;
+    return e / kernelSum;
+  }
+
+  void add(TileType t, double v, double dist) {
+    total[t] = (total[t] ?? 0) + v;
+    count[t] = (count[t] ?? 0) + 1;
+    nearest[t] = math.min(nearest[t] ?? double.infinity, dist);
+  }
+
+  final own = emissionOf(cell);
+  if (own > 0) add(w.tiles[cell], own, 0);
+  final rx = cell % width;
+  final ry = cell ~/ width;
+  for (var k = 0; k < offsets.length; k++) {
+    final sx = rx - offsets.dx[k];
+    final sy = ry - offsets.dy[k];
+    if (!w.inBounds(sx, sy)) continue;
+    final s = sy * width + sx;
+    final e = emissionOf(s);
+    if (e <= 0) continue;
+    add(w.tiles[s], e * math.exp(-offsets.dist[k] * p.cellSizeM / ap.decayLengthM), offsets.dist[k]);
+  }
+  // Scale to the deposited concentration actually stored in the field.
+  var raw = 0.0;
+  for (final v in total.values) {
+    raw += v;
+  }
+  final factor = raw > 0 ? f.airConcentration[cell] / raw : 0.0;
+  final rows = [
+    for (final t in total.keys)
+      Contribution(type: t, count: count[t]!, nearestTiles: nearest[t]!, value: total[t]! * factor),
+  ]..sort((a, b) => b.value.compareTo(a.value));
+  return rows;
 }

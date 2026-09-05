@@ -3,11 +3,11 @@ import 'commands.dart';
 import 'fields.dart';
 import 'indicators.dart';
 import 'model/access.dart';
-import 'model/air.dart';
+import 'model/air.dart' as air_model;
 import 'model/commute.dart';
 import 'model/habitat.dart';
 import 'model/heat.dart';
-import 'model/noise.dart';
+import 'model/noise.dart' as noise_model;
 import 'model/stocks.dart';
 import 'params.dart';
 import 'tile_type.dart';
@@ -93,13 +93,21 @@ class Simulation {
 
   void _computeFields() {
     computeCommute(state, params, fields);
-    computeNoise(state, params, fields);
-    computeAir(state, params, fields);
+    noise_model.computeNoise(state, params, fields);
+    air_model.computeAir(state, params, fields);
     computeHeat(state, params, fields);
     computeAccess(state, params, fields);
     computeHabitat(state, params, fields);
     computeAttractiveness(state, params, fields);
   }
+
+  /// Noise sources reaching (x, y), by tile type, loudest first.
+  List<noise_model.Contribution> explainNoise(int x, int y) =>
+      noise_model.explainNoise(state, params, fields, state.index(x, y));
+
+  /// Air pollution sources reaching (x, y), by tile type, largest first.
+  List<noise_model.Contribution> explainAir(int x, int y) =>
+      air_model.explainAir(state, params, fields, state.index(x, y));
 
   /// Cost in kEUR of placing [tile] at (x, y), or null if not placeable.
   double? placementCost(int x, int y, TileType tile) {

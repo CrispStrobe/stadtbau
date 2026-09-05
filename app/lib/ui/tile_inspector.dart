@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:stadtbau_sim/stadtbau_sim.dart';
 
 import '../game/game_controller.dart';
 import '../l10n/generated/app_localizations.dart';
@@ -84,9 +85,63 @@ class TileInspector extends StatelessWidget {
                   ],
                 ),
               ),
+            const SizedBox(height: 6),
+            _Breakdown(
+              title: l10n.breakdownNoise,
+              rows: sim.explainNoise(x, y),
+              format: (c) => l10n.dbValue(n0.format(c.value)),
+              cellSizeM: sim.params.cellSizeM,
+            ),
+            _Breakdown(
+              title: l10n.breakdownAir,
+              rows: sim.explainAir(x, y),
+              format: (c) => n2.format(c.value),
+              cellSizeM: sim.params.cellSizeM,
+            ),
           ],
         );
       },
+    );
+  }
+}
+
+/// Which tile types cause a field value at the selected cell (task T-206).
+class _Breakdown extends StatelessWidget {
+  const _Breakdown({required this.title, required this.rows, required this.format, required this.cellSizeM});
+
+  final String title;
+  final List<Contribution> rows;
+  final String Function(Contribution) format;
+  final double cellSizeM;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final locale = Localizations.localeOf(context).toString();
+    final n0 = NumberFormat.decimalPatternDigits(locale: locale, decimalDigits: 0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: theme.textTheme.labelLarge),
+        if (rows.isEmpty) Text(l10n.breakdownNone, style: theme.textTheme.bodySmall),
+        for (final c in rows.take(5))
+          Row(
+            children: [
+              Icon(TileStyle.of(c.type).icon, size: 14, color: TileStyle.of(c.type).iconColor),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  l10n.breakdownRow(l10n.tileName(c.type.id), c.count, n0.format(c.nearestTiles * cellSizeM)),
+                  style: theme.textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(format(c), style: theme.textTheme.bodySmall),
+            ],
+          ),
+        const SizedBox(height: 4),
+      ],
     );
   }
 }

@@ -304,9 +304,10 @@ Run `tools/check.sh` (analyze, test, i18n lint, license audit) before marking a 
 - [x] **T-205 Overlays.** Toggleable heat-map overlays for noise, air, heat, green access,
   retail access, habitat quality. Colour-blind-safe palettes; legend with units.
   *Note 2026-09-05:* Nine overlays with colour-blind-safe ramps and legend.
-- [~] **T-206 Tile inspector.** Tap tile → per-field values, contributing emitters
+- [x] **T-206 Tile inspector.** Tap tile → per-field values, contributing emitters
   ("Lärm: 62 dB, davon Hauptstraße (2 Felder) 58 dB…").
   *Note 2026-09-05:* Inspector shows all per-cell fields. Breakdown by contributing emitters still open.
+  *Note 2026-09-05 (3):* `Simulation.explainNoise/explainAir` list contributing tile types (count, nearest distance, level); shown in the inspector.
 - [x] **T-207 Game loop and pace.** Play/pause, 1×/3×/10× ticks, turn mode (tick only on
   "End turn"). Autosave to local storage (`shared_preferences` / file), load/new game.
   *Note 2026-09-05:* Play/pause, step, 1×/3×/10×, new game with size slider. Autosave/load still open.

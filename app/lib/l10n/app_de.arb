@@ -108,5 +108,10 @@
   "endTitleTimeUp": "Die Zeit ist um",
   "endGoalsMet": "{met} von {total} Zielen erreicht",
   "actionKeepPlaying": "Weiterspielen",
-  "actionBackToLevels": "Zurück zur Auswahl"
+  "actionBackToLevels": "Zurück zur Auswahl",
+
+  "breakdownNoise": "Lärmquellen",
+  "breakdownAir": "Schadstoffquellen",
+  "breakdownRow": "{tile} · {count} Felder, nächstes {distance} m",
+  "breakdownNone": "Keine Quellen in Reichweite."
 }

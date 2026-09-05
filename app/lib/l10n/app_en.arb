@@ -147,5 +147,11 @@
   "endGoalsMet": "{met} of {total} goals met",
   "@endGoalsMet": {"placeholders": {"met": {"type": "int"}, "total": {"type": "int"}}},
   "actionKeepPlaying": "Keep playing",
-  "actionBackToLevels": "Back to scenarios"
+  "actionBackToLevels": "Back to scenarios",
+
+  "breakdownNoise": "Noise sources",
+  "breakdownAir": "Pollution sources",
+  "breakdownRow": "{tile} · {count} tiles, nearest {distance} m",
+  "@breakdownRow": {"placeholders": {"tile": {"type": "String"}, "count": {"type": "int"}, "distance": {"type": "String"}}},
+  "breakdownNone": "No sources in range."
 }
