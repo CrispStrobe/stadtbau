@@ -28,3 +28,5 @@ pubspec_overrides.yaml
 app/lib/l10n/generated/
 # Raw datasets never enter the repo
 /data/raw/
+__pycache__/
+*.pyc
