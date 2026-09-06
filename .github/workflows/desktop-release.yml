@@ -1,0 +1,85 @@
+name: desktop-release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+            build_cmd: flutter build linux --release
+            output_dir: app/build/linux/x64/release/bundle
+            zip_cmd: zip -r ../../../../../dist/hectopolis-linux.zip .
+          - os: macos-latest
+            target: macos
+            build_cmd: flutter build macos --release
+            output_dir: app/build/macos/Build/Products/Release
+            zip_cmd: zip -r ../../../../../dist/hectopolis-macos.zip Hectopolis.app
+          - os: windows-latest
+            target: windows
+            build_cmd: flutter build windows --release
+            output_dir: app/build/windows/x64/runner/Release
+            zip_cmd: Compress-Archive -Path * -DestinationPath ../../../../../dist/hectopolis-windows.zip
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux Dependencies
+        if: matrix.target == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgtk-3-dev pkg-config
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.44.1
+          cache: true
+
+      - name: Dependencies
+        run: flutter pub get
+        shell: bash
+
+      - name: Localizations
+        run: |
+          cd app
+          flutter gen-l10n
+        shell: bash
+
+      - name: Build
+        run: |
+          cd app
+          ${{ matrix.build_cmd }}
+        shell: bash
+
+      - name: Package (Unix)
+        if: matrix.target != 'windows'
+        run: |
+          mkdir -p dist
+          cd ${{ matrix.output_dir }}
+          ${{ matrix.zip_cmd }}
+        shell: bash
+
+      - name: Package (Windows)
+        if: matrix.target == 'windows'
+        run: |
+          mkdir dist
+          cd ${{ matrix.output_dir }}
+          ${{ matrix.zip_cmd }}
+        shell: powershell
+
+      - name: Attach to GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: dist/*

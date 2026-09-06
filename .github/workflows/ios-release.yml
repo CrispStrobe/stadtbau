@@ -47,7 +47,7 @@ on:
 # Nothing here writes to the repository; the .ipa goes to an artifact and to
 # App Store Connect.
 permissions:
-  contents: read
+  contents: write
 
 # Never cancel a run that may be mid-upload: a half-delivered build number is
 # burnt either way, and two tags racing is rarer than one upload being killed.
@@ -237,6 +237,13 @@ jobs:
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
         run: bash tools/ios/build-ios-appstore.sh --upload-only
+
+      - name: Attach to GitHub release
+        if: ${{ env.DRY_RUN != 'true' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: app/build/ios/ipa/*.ipa
 
       - name: Summary
         if: always()

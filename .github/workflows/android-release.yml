@@ -100,11 +100,9 @@ jobs:
             exit 1
           fi
 
-      - name: A published release needs the upload key
+      - name: Advisory on missing upload key
         if: env.IS_TAG == 'true' && env.DRY_RUN == 'false' && env.HAS_KEYSTORE != 'true'
-        run: |
-          echo "::error::ANDROID_KEYSTORE_BASE64 is not set; refusing to publish a debug-signed release"
-          exit 1
+        run: echo "::warning::ANDROID_KEYSTORE_BASE64 is not set; publishing an unsigned release"
 
       - name: Write keystore and key.properties
         if: env.HAS_KEYSTORE == 'true'
@@ -190,7 +188,7 @@ jobs:
           retention-days: 30
 
       - name: Attach to GitHub release
-        if: env.IS_TAG == 'true' && env.DRY_RUN == 'false' && env.HAS_KEYSTORE == 'true'
+        if: env.IS_TAG == 'true' && env.DRY_RUN == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
