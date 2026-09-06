@@ -101,8 +101,9 @@ class _GameScreenState extends State<GameScreen> {
 
   Future<void> _newGame() async {
     final l10n = AppLocalizations.of(context);
-    var size = c.width;
-    final result = await showDialog<int>(
+    var w = c.width;
+    var h = c.height;
+    final result = await showDialog<List<int>>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
@@ -110,26 +111,48 @@ class _GameScreenState extends State<GameScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l10n.newGameSize(size)),
-              Slider(
-                value: size.toDouble(),
-                min: 8,
-                max: 24,
-                divisions: 4,
-                label: '$size',
-                onChanged: (v) => setState(() => size = v.round()),
+              Text(l10n.newGameSize(w, h)),
+              Row(
+                children: [
+                  const Text('X'),
+                  Expanded(
+                    child: Slider(
+                      value: w.toDouble(),
+                      min: 8,
+                      max: 64,
+                      divisions: 14,
+                      label: '$w',
+                      onChanged: (v) => setState(() => w = v.round()),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Text('Y'),
+                  Expanded(
+                    child: Slider(
+                      value: h.toDouble(),
+                      min: 8,
+                      max: 64,
+                      divisions: 14,
+                      label: '$h',
+                      onChanged: (v) => setState(() => h = v.round()),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-            FilledButton(onPressed: () => Navigator.pop(context, size), child: Text(l10n.ok)),
+            FilledButton(onPressed: () => Navigator.pop(context, [w, h]), child: Text(l10n.ok)),
           ],
         ),
       ),
     );
     if (result != null) {
-      c.startSandbox(result);
+      c.startSandbox(result[0], result[1]);
       _map.reset();
     }
   }

@@ -51,7 +51,8 @@
   "actionAbout": "Über",
 
   "newGameTitle": "Neues Spiel",
-  "newGameSize": "Kartengröße {size} × {size}",
+  "newGameSize": "Kartengröße {w} × {h}",
+  "@newGameSize": {"placeholders": {"w": {"type": "int"}, "h": {"type": "int"}}},
   "cancel": "Abbrechen",
   "ok": "OK",
 

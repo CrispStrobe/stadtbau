@@ -63,7 +63,7 @@ class Simulation {
     final w = WorldState.empty(
       width: width,
       height: height,
-      budgetKEur: params.economy.startBudgetKEur,
+      budgetKEur: double.infinity,
       seed: seed,
     );
     return Simulation(state: w, params: params);

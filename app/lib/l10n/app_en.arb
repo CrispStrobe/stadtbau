@@ -68,8 +68,8 @@
   "actionAbout": "About",
 
   "newGameTitle": "New game",
-  "newGameSize": "Map size {size} × {size}",
-  "@newGameSize": {"placeholders": {"size": {"type": "int"}}},
+  "newGameSize": "Map size {w} × {h}",
+  "@newGameSize": {"placeholders": {"w": {"type": "int"}, "h": {"type": "int"}}},
   "cancel": "Cancel",
   "ok": "OK",
 

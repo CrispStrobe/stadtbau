@@ -68,7 +68,7 @@ class _LevelSelectScreenState extends State<LevelSelectScreen> {
   }
 
   void _sandbox() {
-    widget.controller.startSandbox(16);
+    widget.controller.startSandbox(16, 16);
     _open();
   }
 

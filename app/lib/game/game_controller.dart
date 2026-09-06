@@ -66,10 +66,10 @@ class GameController extends ChangeNotifier {
     return true;
   }
 
-  void startSandbox(int size) {
+  void startSandbox(int w, int h) {
     _reset();
     level = null;
-    sim = Simulation.sandbox(width: size, height: size);
+    sim = Simulation.sandbox(width: w, height: h);
     _evaluate();
     _scheduleSave();
     notifyListeners();
