@@ -25,6 +25,13 @@ class GameController extends ChangeNotifier {
   Level? level;
   LevelProgress? progress;
 
+  bool simpleMode = false;
+
+  void toggleSimpleMode() {
+    simpleMode = !simpleMode;
+    notifyListeners();
+  }
+
   /// Set once when the level ends (time up or all goals met); the UI shows
   /// the result dialog and then clears it via [acknowledgeEnd].
   bool endPending = false;

@@ -60,7 +60,7 @@ class _GameScreenState extends State<GameScreen> {
         CommandError.tileExhausted => l10n.errorTileExhausted,
       };
       ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
+        ..clearSnackBars()
         ..showSnackBar(SnackBar(content: Text(text), duration: const Duration(seconds: 2)));
       c.lastError = null;
       _shownError = null;

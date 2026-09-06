@@ -250,6 +250,7 @@ class _MapViewState extends State<MapView> {
                     minScale: MapViewController.minScale,
                     maxScale: MapViewController.maxScale,
                     boundaryMargin: EdgeInsets.zero,
+                    panEnabled: c.brush == null,
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       // Inside the InteractiveViewer, so localPosition is
@@ -263,6 +264,19 @@ class _MapViewState extends State<MapView> {
                           c.place(cell % c.width, cell ~/ c.width, brush);
                         } else {
                           c.select(cell);
+                        }
+                      },
+                      onPanStart: c.brush == null ? null : (d) {
+                        _focus.requestFocus();
+                        final cell = _cellAtLocal(d.localPosition, size);
+                        if (cell != null) {
+                          c.place(cell % c.width, cell ~/ c.width, c.brush!);
+                        }
+                      },
+                      onPanUpdate: c.brush == null ? null : (d) {
+                        final cell = _cellAtLocal(d.localPosition, size);
+                        if (cell != null) {
+                          c.place(cell % c.width, cell ~/ c.width, c.brush!);
                         }
                       },
                       onLongPressStart: (d) {

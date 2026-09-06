@@ -45,6 +45,19 @@ class IndicatorPanel extends StatelessWidget {
   final GameController controller;
   final bool compact;
 
+  MapOverlay? _overlayFor(Indicator i) => switch (i) {
+    Indicator.biodiversity => MapOverlay.habitat,
+    Indicator.air => MapOverlay.air,
+    Indicator.noise => MapOverlay.noise,
+    Indicator.housing => MapOverlay.attractiveness,
+    Indicator.economy => MapOverlay.jobs,
+    Indicator.shopping => MapOverlay.retail,
+    Indicator.recreation => MapOverlay.green,
+    Indicator.commuting => MapOverlay.traffic,
+    Indicator.climate => MapOverlay.heat,
+    Indicator.budget => null,
+  };
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -85,6 +98,11 @@ class IndicatorPanel extends StatelessWidget {
               detail: detail(i),
               value: ind.score(i),
               compact: compact,
+              simpleMode: controller.simpleMode,
+              onTap: () {
+                final overlay = _overlayFor(i);
+                if (overlay != null) controller.overlay = overlay;
+              },
             ),
         ];
 
@@ -101,7 +119,16 @@ class IndicatorPanel extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(8),
           children: [
-            Text(l10n.indicatorsTitle, style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              children: [
+                Expanded(child: Text(l10n.indicatorsTitle, style: Theme.of(context).textTheme.titleMedium)),
+                IconButton(
+                  icon: Icon(controller.simpleMode ? Icons.mood : Icons.analytics),
+                  tooltip: controller.simpleMode ? 'Expert mode' : 'Simple mode',
+                  onPressed: controller.toggleSimpleMode,
+                ),
+              ],
+            ),
             ...tiles,
           ],
         );
@@ -118,6 +145,8 @@ class _Gauge extends StatelessWidget {
     required this.detail,
     required this.value,
     required this.compact,
+    required this.simpleMode,
+    required this.onTap,
   });
 
   final Indicator indicator;
@@ -126,6 +155,8 @@ class _Gauge extends StatelessWidget {
   final String detail;
   final double value;
   final bool compact;
+  final bool simpleMode;
+  final VoidCallback onTap;
 
   void _open(BuildContext context) => showIndicatorDetails(context, indicator: indicator, detail: detail);
 
@@ -134,15 +165,36 @@ class _Gauge extends StatelessWidget {
     return Color.lerp(const Color(0xFFD95F0E), const Color(0xFF2C7FB8), v)!;
   }
 
+  String _smiley(double v) {
+    if (v >= 0.8) return '😄';
+    if (v >= 0.6) return '🙂';
+    if (v >= 0.4) return '😐';
+    if (v >= 0.2) return '🙁';
+    return '😠';
+  }
+
+  Color _smileyColor(double v) {
+    if (v >= 0.8) return Colors.green.shade700;
+    if (v >= 0.6) return Colors.lightGreen.shade600;
+    if (v >= 0.4) return Colors.yellow.shade700;
+    if (v >= 0.2) return Colors.orange.shade700;
+    return Colors.red.shade900;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final v = value.clamp(0, 100) / 100;
     final rounded = value.clamp(0, 100).round();
+    
     if (compact) {
       return Tooltip(
         message: '$hint\n$detail',
         child: InkWell(
-          onTap: () => _open(context),
+          onTap: () {
+            onTap();
+            _open(context);
+          },
           onLongPress: () => _open(context),
           borderRadius: BorderRadius.circular(6),
           child: Container(
@@ -157,18 +209,24 @@ class _Gauge extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.labelSmall),
-                Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
+                simpleMode 
+                  ? Text(_smiley(v), style: theme.textTheme.titleMedium?.copyWith(color: _smileyColor(v)))
+                  : Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
               ],
             ),
           ),
         ),
       );
     }
+    
     return Tooltip(
       message: hint,
       waitDuration: const Duration(milliseconds: 600),
       child: InkWell(
-        onTap: () => _open(context),
+        onTap: () {
+          onTap();
+          if (!simpleMode) _open(context);
+        },
         borderRadius: BorderRadius.circular(6),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
@@ -178,21 +236,27 @@ class _Gauge extends StatelessWidget {
               Row(
                 children: [
                   Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
-                  Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
-                  const SizedBox(width: 2),
-                  Icon(Icons.info_outline, size: 14, color: theme.hintColor),
+                  if (simpleMode)
+                    Text(_smiley(v), style: theme.textTheme.titleMedium?.copyWith(color: _smileyColor(v)))
+                  else ...[
+                    Text('$rounded', style: theme.textTheme.titleMedium?.copyWith(color: _color(context))),
+                    const SizedBox(width: 2),
+                    Icon(Icons.info_outline, size: 14, color: theme.hintColor),
+                  ],
                 ],
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: value.clamp(0, 100) / 100,
-                  minHeight: 8,
-                  color: _color(context),
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              if (!simpleMode) ...[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: v,
+                    minHeight: 8,
+                    color: _color(context),
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  ),
                 ),
-              ),
-              Text(detail, style: theme.textTheme.bodySmall),
+                Text(detail, style: theme.textTheme.bodySmall),
+              ],
             ],
           ),
         ),
