@@ -19,17 +19,17 @@ jobs:
             target: linux
             build_cmd: flutter build linux --release
             output_dir: app/build/linux/x64/release/bundle
-            zip_cmd: zip -r ../../../../../dist/hectopolis-linux.zip .
+            zip_cmd: zip -r $GITHUB_WORKSPACE/dist/hectopolis-linux.zip .
           - os: macos-latest
             target: macos
             build_cmd: flutter build macos --release
             output_dir: app/build/macos/Build/Products/Release
-            zip_cmd: zip -r ../../../../../dist/hectopolis-macos.zip Hectopolis.app
+            zip_cmd: zip -r $GITHUB_WORKSPACE/dist/hectopolis-macos.zip Hectopolis.app
           - os: windows-latest
             target: windows
             build_cmd: flutter build windows --release
             output_dir: app/build/windows/x64/runner/Release
-            zip_cmd: Compress-Archive -Path * -DestinationPath ../../../../../dist/hectopolis-windows.zip
+            zip_cmd: Compress-Archive -Path * -DestinationPath $env:GITHUB_WORKSPACE\dist\hectopolis-windows.zip
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -64,7 +64,7 @@ jobs:
       - name: Package (Unix)
         if: matrix.target != 'windows'
         run: |
-          mkdir -p dist
+          mkdir -p $GITHUB_WORKSPACE/dist
           cd ${{ matrix.output_dir }}
           ${{ matrix.zip_cmd }}
         shell: bash
@@ -72,7 +72,7 @@ jobs:
       - name: Package (Windows)
         if: matrix.target == 'windows'
         run: |
-          mkdir dist
+          New-Item -ItemType Directory -Force -Path $env:GITHUB_WORKSPACE\dist
           cd ${{ matrix.output_dir }}
           ${{ matrix.zip_cmd }}
         shell: powershell
